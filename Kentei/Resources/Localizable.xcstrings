@@ -1,0 +1,660 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "atlas.airport" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Bandara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港" } }
+      }
+    },
+    "atlas.airport.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Check-in, bagasi, dan gerbang" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "チェックイン・荷物・搭乗口" } }
+      }
+    },
+    "atlas.convenience" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Minimarket" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "コンビニ" } }
+      }
+    },
+    "atlas.convenience.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pembayaran, jumlah, dan lokasi barang" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "支払い・数量・商品の場所" } }
+      }
+    },
+    "atlas.grab" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Grab・Taksi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Grab・タクシー" } }
+      }
+    },
+    "atlas.grab.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lokasi jemput dan tujuan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "待ち合わせ・行き先・連絡" } }
+      }
+    },
+    "atlas.hero.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kemampuan baru akan terbuka saat Anda belajar." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学ぶほど、できる行動が増えていきます。" } }
+      }
+    },
+    "atlas.hero.eyebrow" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "KEHIDUPAN DI INDONESIA" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "インドネシア生活" } }
+      }
+    },
+    "atlas.hero.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Jelajahi dengan bahasa" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ことばで街を広げよう" } }
+      }
+    },
+    "atlas.scenes" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Adegan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "生活シーン" } }
+      }
+    },
+    "atlas.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Peta Kehidupan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "生活図鑑" } }
+      }
+    },
+    "atlas.warung" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Warung" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワルン" } }
+      }
+    },
+    "atlas.warung.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Memesan dan mengatur tingkat pedas" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "注文・辛さ・おすすめ" } }
+      }
+    },
+    "common.close" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Tutup" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "閉じる" } }
+      }
+    },
+    "common.progress" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Progres" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "進捗" } }
+      }
+    },
+    "home.action.airport" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Menitipkan bagasi di bandara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港で荷物を預ける" } }
+      }
+    },
+    "home.action.airport.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Sedikit lagi menuju tes praktik" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "実戦チェックまであと少し" } }
+      }
+    },
+    "home.action.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kemampuan berikutnya" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "次にできるようになること" } }
+      }
+    },
+    "home.greeting" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Selamat pagi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "おはようございます" } }
+      }
+    },
+    "home.lesson.description" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Dengarkan pengumuman dan pilih maknanya." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "案内を聞いて、意味を選ぶ練習です。" } }
+      }
+    },
+    "home.lesson.duration" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "8 menit" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "約8分" } }
+      }
+    },
+    "home.lesson.questions" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "20 soal" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "20問" } }
+      }
+    },
+    "home.lesson.start" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Mulai belajar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学習を始める" } }
+      }
+    },
+    "home.lesson.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Mendengarkan di bandara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港の聞き取り" } }
+      }
+    },
+    "home.notifications" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Notifikasi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "お知らせ" } }
+      }
+    },
+    "home.progress.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Progres hari ini" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日の進み具合" } }
+      }
+    },
+    "home.review.description" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Ulangi belum dan sudah" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "belum と sudah を聞き分けましょう" } }
+      }
+    },
+    "home.review.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Latihan singkat 3 menit" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "3分だけ復習" } }
+      }
+    },
+    "home.reviews" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Untuk diulang" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "復習する項目" } }
+      }
+    },
+    "home.streak" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Hari berturut-turut" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "連続学習日" } }
+      }
+    },
+    "home.subtitle" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Mari dengarkan sedikit demi sedikit hari ini." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日も少しずつ、聞ける力を育てましょう。" } }
+      }
+    },
+    "home.today" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "BELAJAR HARI INI" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日の学習" } }
+      }
+    },
+    "learn.byLevel" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Belajar berdasarkan tingkat" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "級別に学ぶ" } }
+      }
+    },
+    "learn.byLevel.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pilih materi tingkat E atau D" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "E級・D級の教材を選びます" } }
+      }
+    },
+    "learn.hero.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pengumuman bandara dan percakapan tentang bagasi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港アナウンスと荷物の会話" } }
+      }
+    },
+    "learn.hero.eyebrow" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "REKOMENDASI HARI INI" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日のおすすめ" } }
+      }
+    },
+    "learn.hero.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lanjutkan latihan bandara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港の続きから" } }
+      }
+    },
+    "learn.modes" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pilih cara belajar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学び方を選ぶ" } }
+      }
+    },
+    "learn.recommended" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Rekomendasi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "おまかせ" } }
+      }
+    },
+    "learn.recommended.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Gabungan tema saat ini dan ulasan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在のテーマと復習を組み合わせます" } }
+      }
+    },
+    "learn.review" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Ulangi kelemahan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "弱点を復習" } }
+      }
+    },
+    "learn.review.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Fokus pada kata yang sulit didengar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "聞き取りにくかった表現へ集中します" } }
+      }
+    },
+    "learn.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Belajar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学ぶ" } }
+      }
+    },
+    "midpoint.accuracy" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Akurasi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "正答率" } }
+      }
+    },
+    "midpoint.achievement" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kemajuan kemampuan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "できることが増えました" } }
+      }
+    },
+    "midpoint.achievement.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Anda mulai memahami petunjuk check-in." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "チェックイン案内の要点が聞き取れています。" } }
+      }
+    },
+    "midpoint.continue" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lanjut 10 soal berikutnya" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "次の10問へ" } }
+      }
+    },
+    "midpoint.correct" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Benar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "正解" } }
+      }
+    },
+    "midpoint.eyebrow" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "TITIK TENGAH" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ここでひと休み" } }
+      }
+    },
+    "midpoint.message" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Anda sudah melewati bagian pertama." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "前半をしっかり聞き終えました。" } }
+      }
+    },
+    "midpoint.stop" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Selesai sekarang" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日はここまで" } }
+      }
+    },
+    "midpoint.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "10 soal selesai" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "10問完了" } }
+      }
+    },
+    "progress.currentLevel" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "TINGKAT SAAT INI" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在のレベル" } }
+      }
+    },
+    "progress.dailyLife" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kehidupan sehari-hari" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "生活対応" } }
+      }
+    },
+    "progress.level.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "12 kemampuan telah dipelajari" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "12個の行動を学習済み" } }
+      }
+    },
+    "progress.level.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Dasar tingkat E" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "E級 基礎" } }
+      }
+    },
+    "progress.listening" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Mendengarkan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "聞く" } }
+      }
+    },
+    "progress.recent" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pencapaian terbaru" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "最近の達成" } }
+      }
+    },
+    "progress.recent.airport" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Memahami nomor gerbang" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "搭乗口の番号を聞き取る" } }
+      }
+    },
+    "progress.recent.airport.detail" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lulus tes praktik bandara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港シナリオの実戦チェックに合格" } }
+      }
+    },
+    "progress.skills" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kemampuan bahasa" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ことばの力" } }
+      }
+    },
+    "progress.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Progres" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "進捗" } }
+      }
+    },
+    "progress.vocabulary" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kosakata" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "語彙" } }
+      }
+    },
+    "result.correct" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Jawaban benar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "正解した問題" } }
+      }
+    },
+    "result.eyebrow" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "SESI SELESAI" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "セッション完了" } }
+      }
+    },
+    "result.finish" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kembali ke beranda" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ホームへ戻る" } }
+      }
+    },
+    "result.message" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kemampuan Anda bertambah hari ini." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日も、できることが一つ増えました。" } }
+      }
+    },
+    "result.retry" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Coba lagi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "もう一度練習する" } }
+      }
+    },
+    "result.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kerja bagus" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "おつかれさまでした" } }
+      }
+    },
+    "result.unlocked" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "KEMAMPUAN BARU" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "新しい行動を解放" } }
+      }
+    },
+    "result.unlocked.action" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Menitipkan bagasi di bandara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "空港で荷物を預ける" } }
+      }
+    },
+    "session.audio.instruction" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Ketuk untuk mendengarkan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "タップして音声を聞く" } }
+      }
+    },
+    "session.audio.listening" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Sedang mendengarkan…" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "聞いています…" } }
+      }
+    },
+    "session.audio.noTextHint" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Dengarkan tanpa melihat teks" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "文字を見ずに聞いてみましょう" } }
+      }
+    },
+    "session.audio.play" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Putar audio" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声を再生" } }
+      }
+    },
+    "session.audio.playing" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Audio sedang diputar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声を再生中" } }
+      }
+    },
+    "session.chooseAnswer" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pilih makna yang sesuai" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "聞こえた意味を選んでください" } }
+      }
+    },
+    "session.correct" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Benar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "正解です" } }
+      }
+    },
+    "session.empty.message" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kembali dan coba lagi." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "戻って、もう一度お試しください。" } }
+      }
+    },
+    "session.empty.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Soal tidak tersedia" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "問題を表示できません" } }
+      }
+    },
+    "session.exit.cancel" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lanjut belajar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学習を続ける" } }
+      }
+    },
+    "session.exit.confirm" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Keluar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "終了する" } }
+      }
+    },
+    "session.exit.message" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Anda dapat memulai sesi baru dari beranda." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ホームから新しいセッションを始められます。" } }
+      }
+    },
+    "session.exit.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Akhiri sesi?" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学習を終了しますか？" } }
+      }
+    },
+    "session.incorrect" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Mari dengarkan lagi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "もう一度聞いてみましょう" } }
+      }
+    },
+    "session.next" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Soal berikutnya" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "次の問題へ" } }
+      }
+    },
+    "session.progress.label" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Progres sesi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "セッション進捗" } }
+      }
+    },
+    "session.submit" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Jawab" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "回答する" } }
+      }
+    },
+    "session.toMidpoint" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lihat hasil sementara" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "中間結果を見る" } }
+      }
+    },
+    "session.toResult" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Lihat hasil" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "結果を見る" } }
+      }
+    },
+    "session.transcript" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Audio tadi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "聞こえていた文" } }
+      }
+    },
+    "settings.autoplay" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Putar otomatis" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声を自動再生" } }
+      }
+    },
+    "settings.data" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Data dan dukungan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "データとサポート" } }
+      }
+    },
+    "settings.downloads" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Materi unduhan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ダウンロード済み教材" } }
+      }
+    },
+    "settings.haptics" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Getaran" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "触覚フィードバック" } }
+      }
+    },
+    "settings.help" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Bantuan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ヘルプ・お問い合わせ" } }
+      }
+    },
+    "settings.interfaceLanguage" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Bahasa tampilan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "表示言語" } }
+      }
+    },
+    "settings.language" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Bahasa" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "言語" } }
+      }
+    },
+    "settings.language.japanese" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Jepang" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "日本語" } }
+      }
+    },
+    "settings.learning" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pengaturan belajar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学習設定" } }
+      }
+    },
+    "settings.privacy" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Privasi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プライバシー" } }
+      }
+    },
+    "settings.reducedEffects" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kurangi efek" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "演出を控えめにする" } }
+      }
+    },
+    "settings.speed" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Kecepatan audio" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声速度" } }
+      }
+    },
+    "settings.title" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pengaturan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定" } }
+      }
+    },
+    "tab.atlas" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Peta" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "生活図鑑" } }
+      }
+    },
+    "tab.home" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Beranda" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ホーム" } }
+      }
+    },
+    "tab.learn" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Belajar" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "学ぶ" } }
+      }
+    },
+    "tab.progress" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Progres" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "進捗" } }
+      }
+    },
+    "tab.settings" : {
+      "localizations" : {
+        "id" : { "stringUnit" : { "state" : "translated", "value" : "Pengaturan" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
