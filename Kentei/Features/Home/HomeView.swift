@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct HomeView: View {
+    let resumeState: AppModel.ResumeState
     let onStartLearning: () -> Void
+    let onResumeLearning: () -> Void
 
     private let statColumns = [
         GridItem(.flexible(), spacing: 12),
@@ -13,6 +15,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     header
+                    resumeCard
                     todayLessonCard
                     quickStats
                     nextAction
@@ -36,6 +39,8 @@ struct HomeView: View {
                     .font(.subheadline)
                     .foregroundStyle(KenteiTheme.textSecondary)
             }
+            // 大きい文字設定でも見出しを省略しない。折り返して全文を見せる。
+            .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
 
@@ -55,6 +60,47 @@ struct HomeView: View {
             .accessibilityLabel(Text("home.notifications"))
         }
         .padding(.top, 12)
+    }
+
+    /// 途中離脱した学習がある場合、最優先で「続きから」を示す。
+    @ViewBuilder
+    private var resumeCard: some View {
+        if case let .available(answeredCount, totalCount, _) = resumeState {
+            KenteiCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("home.resume.title", systemImage: "arrow.uturn.left.circle.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KenteiTheme.brandPrimary)
+
+                    Text("home.resume.detail")
+                        .font(.subheadline)
+                        .foregroundStyle(KenteiTheme.textSecondary)
+
+                    HStack(spacing: 10) {
+                        ProgressView(value: Double(answeredCount), total: Double(max(totalCount, 1)))
+                            .tint(KenteiTheme.brandPrimary)
+                        Text("\(answeredCount) / \(totalCount)")
+                            .font(.subheadline.bold().monospacedDigit())
+                            .foregroundStyle(KenteiTheme.textPrimary)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(Text("session.progress.label"))
+                    .accessibilityValue(Text("\(answeredCount) / \(totalCount)"))
+
+                    Button(action: onResumeLearning) {
+                        Label("home.resume.action", systemImage: "play.fill")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .accessibilityIdentifier("home.resumeLesson")
+
+                    Button("home.resume.startOver", action: onStartLearning)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KenteiTheme.textSecondary)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .accessibilityIdentifier("home.startOver")
+                }
+            }
+        }
     }
 
     private var todayLessonCard: some View {
@@ -116,16 +162,16 @@ struct HomeView: View {
 
             LazyVGrid(columns: statColumns, spacing: 12) {
                 MetricChip(
-                    systemImage: "flame.fill",
-                    value: "12",
-                    label: "home.streak",
-                    tint: KenteiTheme.brandAccent
+                    systemImage: "checkmark.seal.fill",
+                    value: "\(resumeState.answeredCount ?? 0)",
+                    label: "home.answeredToday",
+                    tint: KenteiTheme.brandPrimary
                 )
                 MetricChip(
                     systemImage: "arrow.clockwise",
-                    value: "8",
-                    label: "home.reviews",
-                    tint: KenteiTheme.brandPrimary
+                    value: "\(LearningSessionState.checkpointQuestionCount * 2)",
+                    label: "home.sessionLength",
+                    tint: KenteiTheme.brandAccent
                 )
             }
         }

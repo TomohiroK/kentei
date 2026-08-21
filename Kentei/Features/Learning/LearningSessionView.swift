@@ -2,32 +2,35 @@ import SwiftUI
 
 struct LearningSessionContainer: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var session: LearningSessionState
+    @State private var model: LearningSessionModel
     @State private var isShowingExitConfirmation = false
 
-    init(initialState: LearningSessionState = .demo) {
-        _session = State(initialValue: initialState)
+    init(model: LearningSessionModel) {
+        _model = State(initialValue: model)
     }
 
     var body: some View {
         Group {
-            switch session.phase {
+            switch model.state.phase {
             case .answering:
                 QuestionScreen(
-                    session: $session,
+                    model: model,
                     onRequestExit: { isShowingExitConfirmation = true }
                 )
             case .midpoint:
                 MidpointResultView(
-                    session: session,
-                    onContinue: { session.continueAfterMidpoint() },
+                    state: model.state,
+                    onContinue: { model.continueAfterMidpoint() },
                     onExit: { dismiss() }
                 )
             case .finalResult:
                 FinalResultView(
-                    session: session,
-                    onRestart: { session.restart() },
-                    onFinish: { dismiss() }
+                    state: model.state,
+                    onRestart: { model.restart() },
+                    onFinish: {
+                        model.finish()
+                        dismiss()
+                    }
                 )
             }
         }
@@ -47,8 +50,10 @@ struct LearningSessionContainer: View {
 }
 
 private struct QuestionScreen: View {
-    @Binding var session: LearningSessionState
+    let model: LearningSessionModel
     let onRequestExit: () -> Void
+
+    private var session: LearningSessionState { model.state }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -59,11 +64,8 @@ private struct QuestionScreen: View {
                     VStack(spacing: 22) {
                         scenarioBadge(question.scenarioName)
 
-                        AudioPromptControl(
-                            playCount: session.audioPlayCount,
-                            onPlay: { session.registerAudioPlayback() }
-                        )
-                        .id(question.id)
+                        AudioPromptControl(model: model, questionID: question.id)
+                            .id(question.id)
 
                         choices(for: question)
 
@@ -76,6 +78,9 @@ private struct QuestionScreen: View {
                 }
                 .safeAreaInset(edge: .bottom) {
                     bottomAction
+                }
+                .safeAreaInset(edge: .top) {
+                    persistenceWarning
                 }
             } else {
                 ContentUnavailableView(
@@ -109,14 +114,15 @@ private struct QuestionScreen: View {
                 Spacer()
 
                 HStack(spacing: 5) {
-                    Image(systemName: "flame.fill")
-                        .foregroundStyle(KenteiTheme.brandAccent)
-                    Text("12")
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundStyle(KenteiTheme.success)
+                    Text("\(session.correctCount)")
                         .font(.subheadline.bold().monospacedDigit())
                 }
                 .frame(minWidth: 44, minHeight: 44)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel(Text("home.streak"))
+                .accessibilityLabel(Text("session.correctSoFar"))
+                .accessibilityValue(Text("\(session.correctCount)"))
             }
 
             GeometryReader { proxy in
@@ -166,7 +172,7 @@ private struct QuestionScreen: View {
                     correctChoiceID: question.correctChoiceID,
                     selectedChoiceID: session.selectedChoiceID,
                     submittedChoiceID: session.submittedChoiceID,
-                    onSelect: { session.select(choice.id) }
+                    onSelect: { model.select(choice.id) }
                 )
             }
         }
@@ -203,20 +209,34 @@ private struct QuestionScreen: View {
         }
     }
 
+    @ViewBuilder
+    private var persistenceWarning: some View {
+        if model.hasPersistenceFailure {
+            Label("session.saveFailed", systemImage: "exclamationmark.triangle.fill")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(KenteiTheme.error)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, KenteiTheme.horizontalPadding)
+                .padding(.vertical, 8)
+                .background(KenteiTheme.error.opacity(0.10))
+                .accessibilityElement(children: .combine)
+        }
+    }
+
     private var bottomAction: some View {
         VStack(spacing: 0) {
             Divider()
 
             if session.submittedChoiceID == nil {
                 Button("session.submit") {
-                    session.submit()
+                    model.submit()
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(session.selectedChoiceID == nil)
                 .accessibilityIdentifier("session.submitAnswer")
             } else {
                 Button(nextButtonTitle) {
-                    session.advance()
+                    model.advance()
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .accessibilityIdentifier("session.nextQuestion")
@@ -240,20 +260,32 @@ private struct QuestionScreen: View {
 }
 
 private struct AudioPromptControl: View {
-    let playCount: Int
-    let onPlay: () -> Void
+    let model: LearningSessionModel
+    let questionID: QuestionID
 
-    @State private var playbackRequest = 0
-    @State private var isPlaying = false
+    @AppStorage(LearningPreferenceKey.playbackRate) private var storedRate = PlaybackRate.standard.rawValue
+    @AppStorage(LearningPreferenceKey.autoplay) private var isAutoplayEnabled = true
+
+    private var rate: PlaybackRate {
+        PlaybackRate(rawValue: storedRate) ?? .standard
+    }
+
+    private var isPlaying: Bool {
+        model.audioState == .playing
+    }
 
     var body: some View {
         KenteiCard {
             VStack(spacing: 16) {
-                LearningCompanionView(expression: isPlaying ? .thinking : .normal, size: 92)
+                LearningCompanionView(
+                    expression: isPlaying ? .thinking : .normal,
+                    size: 92,
+                    isSpeaking: isPlaying,
+                    speechPulse: model.speechPulse
+                )
 
                 Button {
-                    onPlay()
-                    playbackRequest += 1
+                    model.playCurrentQuestion(rate: rate)
                 } label: {
                     ZStack {
                         Circle()
@@ -266,32 +298,59 @@ private struct AudioPromptControl: View {
                     }
                 }
                 .accessibilityLabel(Text(isPlaying ? "session.audio.playing" : "session.audio.play"))
-                .accessibilityValue(Text("\(playCount)"))
+                .accessibilityValue(Text("\(model.state.audioPlayCount)"))
                 .accessibilityIdentifier("session.playAudio")
+
+                ratePicker
 
                 VStack(spacing: 4) {
                     Text(isPlaying ? "session.audio.listening" : "session.audio.instruction")
                         .font(.headline)
                         .foregroundStyle(KenteiTheme.textPrimary)
+                        .multilineTextAlignment(.center)
                     Text("session.audio.noTextHint")
                         .font(.caption)
                         .foregroundStyle(KenteiTheme.textSecondary)
+                        .multilineTextAlignment(.center)
                 }
+
+                audioFailureMessage
             }
             .frame(maxWidth: .infinity)
         }
-        .task(id: playbackRequest) {
-            guard playbackRequest > 0 else { return }
-            isPlaying = true
+        .task(id: questionID) {
+            guard isAutoplayEnabled else { return }
+            model.playCurrentQuestion(rate: rate)
+        }
+        .onDisappear {
+            model.stopAudio()
+        }
+    }
 
-            do {
-                try await Task.sleep(for: .seconds(1.25))
-                if !Task.isCancelled {
-                    isPlaying = false
-                }
-            } catch {
-                isPlaying = false
+    /// E級教材のみ 0.8 倍を許容する。標準速度を既定にして、基準記録が遅い速度に寄らないようにする。
+    private var ratePicker: some View {
+        Picker("session.audio.rate", selection: $storedRate) {
+            ForEach(PlaybackRate.allCases, id: \.rawValue) { option in
+                Text(option.displayText).tag(option.rawValue)
             }
+        }
+        .pickerStyle(.segmented)
+        .frame(maxWidth: 220)
+        .accessibilityIdentifier("session.audioRate")
+    }
+
+    @ViewBuilder
+    private var audioFailureMessage: some View {
+        if case let .failed(error) = model.audioState {
+            Label(
+                error == .voiceUnavailable ? "session.audio.voiceMissing" : "session.audio.failed",
+                systemImage: "speaker.slash.fill"
+            )
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(KenteiTheme.error)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
         }
     }
 }
@@ -369,7 +428,7 @@ private struct AnswerChoiceRow: View {
 }
 
 private struct MidpointResultView: View {
-    let session: LearningSessionState
+    let state: LearningSessionState
     let onContinue: () -> Void
     let onExit: () -> Void
 
@@ -394,13 +453,13 @@ private struct MidpointResultView: View {
                 HStack(spacing: 12) {
                     MetricChip(
                         systemImage: "checkmark.circle.fill",
-                        value: "\(session.correctCount) / 10",
+                        value: "\(state.correctCountUpToCheckpoint) / \(LearningSessionState.checkpointQuestionCount)",
                         label: "midpoint.correct",
                         tint: KenteiTheme.success
                     )
                     MetricChip(
                         systemImage: "headphones",
-                        value: "\(Int((session.accuracy * 100).rounded()))%",
+                        value: "\(Int((state.accuracy * 100).rounded()))%",
                         label: "midpoint.accuracy",
                         tint: KenteiTheme.brandPrimary
                     )
@@ -432,7 +491,7 @@ private struct MidpointResultView: View {
 }
 
 private struct FinalResultView: View {
-    let session: LearningSessionState
+    let state: LearningSessionState
     let onRestart: () -> Void
     let onFinish: () -> Void
 
@@ -456,14 +515,14 @@ private struct FinalResultView: View {
 
                 HStack(spacing: 20) {
                     ProgressRing(
-                        progress: session.accuracy,
-                        label: "\(Int((session.accuracy * 100).rounded()))%",
+                        progress: state.accuracy,
+                        label: "\(Int((state.accuracy * 100).rounded()))%",
                         size: 96
                     )
 
                     VStack(alignment: .leading, spacing: 8) {
                         Label("result.correct", systemImage: "checkmark.circle.fill")
-                        Text("\(session.correctCount) / \(session.questions.count)")
+                        Text("\(state.correctCount) / \(state.questions.count)")
                             .font(.title2.bold().monospacedDigit())
                     }
                     .foregroundStyle(KenteiTheme.textPrimary)

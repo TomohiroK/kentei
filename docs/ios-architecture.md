@@ -50,6 +50,19 @@ Kentei/
 
 FeatureはCoreやDataの具体実装を直接生成せず、Domainで定義したプロトコルを環境から受け取る。
 
+現在の実装は上記の骨格のうち、必要になった部分だけを作っている。
+
+```text
+Kentei/
+├── App/            KenteiApp, RootView, AppModel
+├── Core/           SystemDependencies（時計・識別子）, LearningPreferences
+├── Domain/         LearningSessionState, LearningSessionSnapshot, QuestionAudio
+├── Data/           LearningSessionStore, SpeechQuestionAudioPlayer
+├── DesignSystem/   KenteiTheme, KenteiComponents
+├── Features/       Home, Learning, ScenarioAtlas, Supporting
+└── Resources/      Assets.xcassets, Localizable.xcstrings
+```
+
 ## 3. レイヤー責務
 
 ### Domain
@@ -174,6 +187,20 @@ E〜D級MVPで到達不能な形式はパーサーで認識できても、セッ
 
 保存モデルには `schemaVersion` を持たせる。モデル変更時は、旧バージョンの代表データからの移行、途中セッション復元、ロールバック不能条件をテストする。
 
+### 実装状況
+
+`LearningSessionSnapshot`（`schemaVersion = 1`）を `FileLearningSessionStore` が
+Application Support 配下へアトミックに書き込む。保存の起点は `LearningSessionModel` で、
+回答確定・区切り通過・再挑戦のたびに保存し、保存順序は直列につなぐ。
+
+- 未確定の選択は保存しない。復帰は常に確定済み回答の次の問題から始まる。
+- 保存済みデータは次の場合に復帰させず破棄する: `schemaVersion` 不一致、
+  教材パックの版違い、出題順の不一致、存在しない問題・選択肢の参照、同一問題の重複回答。
+- 保存ファイルが壊れている場合は `LearningSessionStoreError.corruptedData` として扱い、
+  破棄して新規セッションから始められる状態へ戻す。
+- 保存に失敗した場合は学習画面に警告を表示する。失敗を黙って握りつぶさない。
+- セッション完了（総合結果の「終わる」）で保存データを破棄する。
+
 ## 7. コンテンツ配信とオフライン
 
 教材はバージョン付きコンテンツパックとして扱う。
@@ -205,6 +232,23 @@ audio-manifest.json
 - 画面離脱時の停止とタスクキャンセル
 
 再生回数は、再生開始が実際に成功した時点で加算する。先読みや失敗した開始は再生回数へ含めない。
+
+### 実装状況
+
+`QuestionAudioPlaying`（Domain）に対する実装は `SpeechQuestionAudioPlayer` で、
+端末内の音声合成でインドネシア語を読み上げる **暫定実装** である。教材の正式音声
+（2話者の録音）が確定するまでの代替であり、合成音声を基準記録として扱わない。
+
+- 0.8倍 / 1.0倍を設定として保持し、学習画面と設定画面のどちらからも変更できる。
+- 自動再生は設定で切り替える。問題が変わるたびに再生を開始する。
+- 再生中に次の再生要求が来た場合、前の再生を止めてから始める。多重再生しない。
+- 画面離脱・問題送り・セッション終了で再生を止め、再生タスクをキャンセルする。
+- オーディオセッションの中断（電話・Siri 等）を購読し、中断は失敗として表示しない。
+- 端末にインドネシア語の音声が無い場合は、追加方法を案内する文言を表示する。
+- 発話の区切りを `onSpeechMark` で通知し、キャラクターの口の動きへ同期させる。
+
+実音声アセットへ移行するときは、同じプロトコルの別実装を用意し、
+`prepare(_:)` を次問の先読みに使う。
 
 録音を導入するB級以降では、マイク権限を録音操作の直前に説明して要求し、拒否・制限・許可を分けて表示する。
 

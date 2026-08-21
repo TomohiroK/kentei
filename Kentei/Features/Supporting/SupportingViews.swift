@@ -184,17 +184,19 @@ struct LearningProgressView: View {
 }
 
 struct SettingsView: View {
-    @State private var autoplay = true
-    @State private var haptics = true
-    @State private var reducedEffects = false
+    @AppStorage(LearningPreferenceKey.playbackRate) private var playbackRate = PlaybackRate.standard.rawValue
+    @AppStorage(LearningPreferenceKey.autoplay) private var autoplay = true
+    @AppStorage(LearningPreferenceKey.haptics) private var haptics = true
+    @AppStorage(LearningPreferenceKey.reducedEffects) private var reducedEffects = false
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("settings.learning") {
-                    Picker("settings.speed", selection: .constant(1.0)) {
-                        Text("0.8×").tag(0.8)
-                        Text("1.0×").tag(1.0)
+                    Picker("settings.speed", selection: $playbackRate) {
+                        ForEach(PlaybackRate.allCases, id: \.rawValue) { rate in
+                            Text(rate.displayText).tag(rate.rawValue)
+                        }
                     }
                     Toggle("settings.autoplay", isOn: $autoplay)
                     Toggle("settings.haptics", isOn: $haptics)

@@ -20,6 +20,17 @@
 		A10000000000000000000211 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000110 /* Localizable.xcstrings */; };
 		A10000000000000000000212 /* LearningSessionStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000111 /* LearningSessionStateTests.swift */; };
 		A10000000000000000000213 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* XCTest.framework */; };
+		A10000000000000000000214 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000113 /* AppModel.swift */; };
+		A10000000000000000000215 /* SystemDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000114 /* SystemDependencies.swift */; };
+		A10000000000000000000216 /* LearningSessionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000115 /* LearningSessionSnapshot.swift */; };
+		A10000000000000000000217 /* LearningSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000116 /* LearningSessionStore.swift */; };
+		A10000000000000000000218 /* LearningSessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000117 /* LearningSessionModel.swift */; };
+		A10000000000000000000219 /* QuestionAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000118 /* QuestionAudio.swift */; };
+		A10000000000000000000220 /* SpeechQuestionAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000119 /* SpeechQuestionAudioPlayer.swift */; };
+		A10000000000000000000221 /* LearningPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000120 /* LearningPreferences.swift */; };
+		A10000000000000000000222 /* TestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000121 /* TestDoubles.swift */; };
+		A10000000000000000000223 /* LearningSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000122 /* LearningSessionPersistenceTests.swift */; };
+		A10000000000000000000224 /* LearningSessionModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000123 /* LearningSessionModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +59,17 @@
 		A10000000000000000000110 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Resources/Localizable.xcstrings; sourceTree = "<group>"; };
 		A10000000000000000000111 /* LearningSessionStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningSessionStateTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000112 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+		A10000000000000000000113 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/AppModel.swift; sourceTree = "<group>"; };
+		A10000000000000000000114 /* SystemDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SystemDependencies.swift; sourceTree = "<group>"; };
+		A10000000000000000000115 /* LearningSessionSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/LearningSessionSnapshot.swift; sourceTree = "<group>"; };
+		A10000000000000000000116 /* LearningSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/LearningSessionStore.swift; sourceTree = "<group>"; };
+		A10000000000000000000117 /* LearningSessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Learning/LearningSessionModel.swift; sourceTree = "<group>"; };
+		A10000000000000000000118 /* QuestionAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/QuestionAudio.swift; sourceTree = "<group>"; };
+		A10000000000000000000119 /* SpeechQuestionAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/SpeechQuestionAudioPlayer.swift; sourceTree = "<group>"; };
+		A10000000000000000000120 /* LearningPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/LearningPreferences.swift; sourceTree = "<group>"; };
+		A10000000000000000000121 /* TestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDoubles.swift; sourceTree = "<group>"; };
+		A10000000000000000000122 /* LearningSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningSessionPersistenceTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000123 /* LearningSessionModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningSessionModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +113,14 @@
 		A10000000000000000000004 /* Kentei */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000120 /* LearningPreferences.swift */,
+				A10000000000000000000119 /* SpeechQuestionAudioPlayer.swift */,
+				A10000000000000000000118 /* QuestionAudio.swift */,
+				A10000000000000000000117 /* LearningSessionModel.swift */,
+				A10000000000000000000116 /* LearningSessionStore.swift */,
+				A10000000000000000000115 /* LearningSessionSnapshot.swift */,
+				A10000000000000000000114 /* SystemDependencies.swift */,
+				A10000000000000000000113 /* AppModel.swift */,
 				A10000000000000000000100 /* KenteiApp.swift */,
 				A10000000000000000000101 /* RootView.swift */,
 				A10000000000000000000102 /* LearningSessionState.swift */,
@@ -109,6 +139,9 @@
 		A10000000000000000000005 /* KenteiTests */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000123 /* LearningSessionModelTests.swift */,
+				A10000000000000000000122 /* LearningSessionPersistenceTests.swift */,
+				A10000000000000000000121 /* TestDoubles.swift */,
 				A10000000000000000000111 /* LearningSessionStateTests.swift */,
 			);
 			path = KenteiTests;
@@ -215,6 +248,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000221 /* LearningPreferences.swift in Sources */,
+				A10000000000000000000220 /* SpeechQuestionAudioPlayer.swift in Sources */,
+				A10000000000000000000219 /* QuestionAudio.swift in Sources */,
+				A10000000000000000000218 /* LearningSessionModel.swift in Sources */,
+				A10000000000000000000217 /* LearningSessionStore.swift in Sources */,
+				A10000000000000000000216 /* LearningSessionSnapshot.swift in Sources */,
+				A10000000000000000000215 /* SystemDependencies.swift in Sources */,
+				A10000000000000000000214 /* AppModel.swift in Sources */,
 				A10000000000000000000201 /* KenteiApp.swift in Sources */,
 				A10000000000000000000202 /* RootView.swift in Sources */,
 				A10000000000000000000203 /* LearningSessionState.swift in Sources */,
@@ -231,6 +272,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000224 /* LearningSessionModelTests.swift in Sources */,
+				A10000000000000000000223 /* LearningSessionPersistenceTests.swift in Sources */,
+				A10000000000000000000222 /* TestDoubles.swift in Sources */,
 				A10000000000000000000212 /* LearningSessionStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +332,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MZV3DAL469;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -298,7 +343,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.KenteiPrototype;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomohirok.kentei;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -313,6 +358,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MZV3DAL469;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Kentei;
@@ -322,7 +368,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.KenteiPrototype;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomohirok.kentei;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -337,9 +383,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MZV3DAL469;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.KenteiPrototypeTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomohirok.kentei.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
@@ -353,9 +400,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MZV3DAL469;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.KenteiPrototypeTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomohirok.kentei.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;

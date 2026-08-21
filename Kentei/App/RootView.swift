@@ -9,45 +9,43 @@ private enum AppTab: Hashable {
 }
 
 struct RootView: View {
-    @State private var selectedTab: AppTab = .home
-    @State private var isShowingSession: Bool
-    private let initialSession: LearningSessionState
+    @State private var appModel: AppModel
+    @State private var selectedTab: AppTab
+    @State private var activeSession: LearningSessionModel?
 
-    init() {
+    /// UIテスト用の起動引数。永続化を伴わない決まった画面を直接開く。
+    private static let scenarioArguments = ["-showLearningSession", "-showMidpointResult", "-showFinalResult"]
+
+    init(appModel: AppModel? = nil) {
         let arguments = ProcessInfo.processInfo.arguments
+        let isScenarioLaunch = arguments.contains { Self.scenarioArguments.contains($0) }
+        let resolvedModel = appModel
+            ?? (isScenarioLaunch ? AppModel(store: DisabledLearningSessionStore()) : AppModel.live())
+
+        _appModel = State(initialValue: resolvedModel)
         _selectedTab = State(initialValue: arguments.contains("-showAtlas") ? .atlas : .home)
-        let showsSession = arguments.contains("-showLearningSession")
-            || arguments.contains("-showMidpointResult")
-            || arguments.contains("-showFinalResult")
-
-        _isShowingSession = State(initialValue: showsSession)
-
-        if arguments.contains("-showFinalResult") {
-            initialSession = .demoFinalResult
-        } else if arguments.contains("-showMidpointResult") {
-            initialSession = .demoMidpoint
-        } else {
-            initialSession = .demo
-        }
+        _activeSession = State(
+            initialValue: Self.scenarioSession(arguments: arguments, appModel: resolvedModel)
+        )
     }
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView {
-                isShowingSession = true
-            }
+            HomeView(
+                resumeState: appModel.resumeState,
+                onStartLearning: startNewSession,
+                onResumeLearning: resumeSession
+            )
             .tabItem {
                 Label("tab.home", systemImage: "house.fill")
             }
             .tag(AppTab.home)
 
-            LearnView {
-                isShowingSession = true
-            }
-            .tabItem {
-                Label("tab.learn", systemImage: "headphones")
-            }
-            .tag(AppTab.learn)
+            LearnView(onStartLearning: startNewSession)
+                .tabItem {
+                    Label("tab.learn", systemImage: "headphones")
+                }
+                .tag(AppTab.learn)
 
             ScenarioAtlasView()
                 .tabItem {
@@ -67,8 +65,39 @@ struct RootView: View {
                 }
                 .tag(AppTab.settings)
         }
-        .fullScreenCover(isPresented: $isShowingSession) {
-            LearningSessionContainer(initialState: initialSession)
+        .task {
+            await appModel.refreshResumeState()
         }
+        .fullScreenCover(item: $activeSession, onDismiss: refreshResumeState) { session in
+            LearningSessionContainer(model: session)
+        }
+    }
+
+    /// 再開データがあっても、明示的に「最初から」を選んだ場合は新しいセッションで上書きする。
+    private func startNewSession() {
+        activeSession = appModel.makeNewSessionModel()
+    }
+
+    private func resumeSession() {
+        activeSession = appModel.makeResumedSessionModel() ?? appModel.makeNewSessionModel()
+    }
+
+    private func refreshResumeState() {
+        Task {
+            await appModel.refreshResumeState()
+        }
+    }
+
+    private static func scenarioSession(arguments: [String], appModel: AppModel) -> LearningSessionModel? {
+        if arguments.contains("-showFinalResult") {
+            return appModel.makeSessionModel(state: .demoFinalResult)
+        }
+        if arguments.contains("-showMidpointResult") {
+            return appModel.makeSessionModel(state: .demoMidpoint)
+        }
+        if arguments.contains("-showLearningSession") {
+            return appModel.makeSessionModel(state: .demo)
+        }
+        return nil
     }
 }

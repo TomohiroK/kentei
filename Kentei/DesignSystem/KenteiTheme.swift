@@ -50,6 +50,10 @@ enum KenteiTheme {
         light: UIColor(red: 0.71, green: 0.23, blue: 0.29, alpha: 1),
         dark: UIColor(red: 0.98, green: 0.46, blue: 0.53, alpha: 1)
     )
+    /// キャラクターの口パク用。参照素材の開いた口と同じ色域に合わせる。
+    static let companionMouth = Color(uiColor: UIColor(red: 0.62, green: 0.22, blue: 0.31, alpha: 1))
+    static let companionTongue = Color(uiColor: UIColor(red: 0.95, green: 0.55, blue: 0.60, alpha: 1))
+
     static let divider = Color(uiColor: .separator).opacity(0.22)
 
     static let cardCornerRadius: CGFloat = 20
