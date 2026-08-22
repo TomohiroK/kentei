@@ -53,6 +53,15 @@
                ReferencedContainer = "container:Kentei.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A10000000000000000000025"
+               BuildableName = "KenteiUITests.xctest"
+               BlueprintName = "KenteiUITests"
+               ReferencedContainer = "container:Kentei.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

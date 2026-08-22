@@ -897,6 +897,518 @@
         }
       }
     },
+    "onboarding.audio.body": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belajar dimulai dari suara. Putar contoh berikut, lalu beri tahu apakah terdengar."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習は音声から始まります。再生して、聞こえるかどうかを選んでください。"
+          }
+        }
+      }
+    },
+    "onboarding.audio.heard": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terdengar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聞こえた"
+          }
+        }
+      }
+    },
+    "onboarding.audio.help.body": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periksa volume dan sakelar senyap perangkat. Jika masih tidak terdengar, tambahkan suara bahasa Indonesia melalui Pengaturan → Aksesibilitas → Konten Lisan."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "端末の音量と消音スイッチを確認してください。それでも聞こえない場合は、設定アプリの「アクセシビリティ」→「読み上げコンテンツ」からインドネシア語の音声を追加してください。"
+          }
+        }
+      }
+    },
+    "onboarding.audio.help.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika tidak terdengar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聞こえないときは"
+          }
+        }
+      }
+    },
+    "onboarding.audio.notHeard": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak terdengar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聞こえない"
+          }
+        }
+      }
+    },
+    "onboarding.audio.play": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putar contoh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サンプルを再生する"
+          }
+        }
+      }
+    },
+    "onboarding.audio.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mari pastikan suaranya terdengar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声が聞こえるか確かめましょう"
+          }
+        }
+      }
+    },
+    "onboarding.back": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kembali"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戻る"
+          }
+        }
+      }
+    },
+    "onboarding.experience.beginner": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paham sapaan dasar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あいさつ程度なら分かる"
+          }
+        }
+      }
+    },
+    "onboarding.experience.conversational": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisa percakapan sehari-hari"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日常会話はある程度できる"
+          }
+        }
+      }
+    },
+    "onboarding.experience.none": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baru mulai belajar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "はじめて学ぶ"
+          }
+        }
+      }
+    },
+    "onboarding.experience.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pengalaman bahasa Indonesia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インドネシア語の経験"
+          }
+        }
+      }
+    },
+    "onboarding.intro.body": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latihan menangkap makna dari suara, agar siap untuk ujian sekaligus kehidupan sehari-hari."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声から意味をつかむ練習を積み重ねて、検定と現地の生活の両方に効く聞き取る力を育てます。"
+          }
+        }
+      }
+    },
+    "onboarding.intro.point.audio": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih jawabannya dari suara sebelum melihat teks"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字を見る前に、まず音声から選びます"
+          }
+        }
+      }
+    },
+    "onboarding.intro.point.daily": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belajar lewat situasi nyata: bandara, warung, transportasi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空港・ワルン・配車など、実際の場面で学びます"
+          }
+        }
+      }
+    },
+    "onboarding.intro.point.short": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 soal per sesi, dengan jeda di soal ke-10"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1回20問。10問で区切りがあります"
+          }
+        }
+      }
+    },
+    "onboarding.intro.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belajar bahasa Indonesia dengan mendengar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聞いて覚える、インドネシア語"
+          }
+        }
+      }
+    },
+    "onboarding.language.body": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anda dapat mengubahnya nanti di Pengaturan."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あとから設定で変更できます。"
+          }
+        }
+      }
+    },
+    "onboarding.language.id": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Indonesia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インドネシア語"
+          }
+        }
+      }
+    },
+    "onboarding.language.ja": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Jepang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語"
+          }
+        }
+      }
+    },
+    "onboarding.language.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih bahasa tampilan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表示する言語を選んでください"
+          }
+        }
+      }
+    },
+    "onboarding.level.body": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesi pertama dimulai dari tingkat E. Anda dapat naik tingkat setelah terbiasa."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初の学習はE級から始まります。慣れてきたら上の級へ進みます。"
+          }
+        }
+      }
+    },
+    "onboarding.level.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih tingkat yang Anda tuju"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標の級を選んでください"
+          }
+        }
+      }
+    },
+    "onboarding.next": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lanjut"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次へ"
+          }
+        }
+      }
+    },
+    "onboarding.progress": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progres pengaturan awal"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初回設定の進み具合"
+          }
+        }
+      }
+    },
+    "onboarding.purpose.body": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digunakan untuk menyesuaikan situasi yang muncul dalam soal."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出題する場面の重みづけに使います。"
+          }
+        }
+      }
+    },
+    "onboarding.purpose.certification": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingin lulus ujian"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検定に合格したい"
+          }
+        }
+      }
+    },
+    "onboarding.purpose.living": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk kehidupan sehari-hari di Indonesia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現地での生活で使いたい"
+          }
+        }
+      }
+    },
+    "onboarding.purpose.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apa tujuan belajar Anda?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習の目的を教えてください"
+          }
+        }
+      }
+    },
+    "onboarding.purpose.travel": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk perjalanan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "旅行で使いたい"
+          }
+        }
+      }
+    },
+    "onboarding.purpose.work": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk pekerjaan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仕事で使いたい"
+          }
+        }
+      }
+    },
+    "onboarding.start": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mulai belajar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習を始める"
+          }
+        }
+      }
+    },
     "progress.currentLevel": {
       "localizations": {
         "id": {
@@ -1473,6 +1985,22 @@
         }
       }
     },
+    "session.explanation": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penjelasan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解説"
+          }
+        }
+      }
+    },
     "session.incorrect": {
       "localizations": {
         "id": {
@@ -1533,6 +2061,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "学習の保存に失敗しました。端末の空き容量を確認してください。"
+          }
+        }
+      }
+    },
+    "session.showExplanation": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lihat penjelasan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解説を見る"
           }
         }
       }

@@ -114,3 +114,25 @@ final class FakeQuestionAudioPlayer: QuestionAudioPlaying {
         }
     }
 }
+
+// MARK: - セッション生成のヘルパー
+
+enum TestSession {
+    /// 種を固定した決定的なセッション。並びを検証したいテストから使う。
+    static func makeState(
+        seed: UInt64 = 1,
+        pack: LearningContentPack = DemoLearningContent.pack
+    ) throws -> LearningSessionState {
+        var generator = SeededRandomNumberGenerator(seed: seed)
+        let plan = LearningSessionPlanner.makePlan(from: pack, using: &generator)
+        return try LearningSessionState(contentPack: pack, plan: plan)
+    }
+
+    static func makePlan(
+        seed: UInt64 = 1,
+        pack: LearningContentPack = DemoLearningContent.pack
+    ) -> LearningSessionPlan {
+        var generator = SeededRandomNumberGenerator(seed: seed)
+        return LearningSessionPlanner.makePlan(from: pack, using: &generator)
+    }
+}

@@ -55,11 +55,12 @@ FeatureはCoreやDataの具体実装を直接生成せず、Domainで定義し�
 ```text
 Kentei/
 ├── App/            KenteiApp, RootView, AppModel
-├── Core/           SystemDependencies（時計・識別子）, LearningPreferences
-├── Domain/         LearningSessionState, LearningSessionSnapshot, QuestionAudio
+├── Core/           SystemDependencies（時計・識別子・乱数）, LearningPreferences
+├── Domain/         LearningSessionState, LearningSessionSnapshot, QuestionAudio,
+│                   LearnerProfile, DemoLearningContent
 ├── Data/           LearningSessionStore, SpeechQuestionAudioPlayer
 ├── DesignSystem/   KenteiTheme, KenteiComponents
-├── Features/       Home, Learning, ScenarioAtlas, Supporting
+├── Features/       Onboarding, Home, Learning, ScenarioAtlas, Supporting
 └── Resources/      Assets.xcassets, Localizable.xcstrings
 ```
 
@@ -187,15 +188,31 @@ E〜D級MVPで到達不能な形式はパーサーで認識できても、セッ
 
 保存モデルには `schemaVersion` を持たせる。モデル変更時は、旧バージョンの代表データからの移行、途中セッション復元、ロールバック不能条件をテストする。
 
+### 出題の組み立て
+
+教材パックは問題の母集団であり、1セッションの出題内容は `LearningSessionPlanner` が
+セッション開始時に決める。決めるのは次の2つで、どちらもセッションごとに変わる。
+
+- 母集団から出題する問題と、その順序
+- 各問題の選択肢の表示順
+
+これにより、同じ教材でも毎回違う並びで出題され、正解の位置も固定されない。
+選択肢の識別子は原稿順に固定してあるため、並びを変えても保存済み回答の参照は壊れない。
+
+乱数は `RandomGeneratorProviding` で注入する。本番は端末の乱数、テストとプレビューは
+種を固定した生成器を使い、同じ並びを再現する。
+
 ### 実装状況
 
-`LearningSessionSnapshot`（`schemaVersion = 1`）を `FileLearningSessionStore` が
+`LearningSessionSnapshot`（`schemaVersion = 2`）を `FileLearningSessionStore` が
 Application Support 配下へアトミックに書き込む。保存の起点は `LearningSessionModel` で、
 回答確定・区切り通過・再挑戦のたびに保存し、保存順序は直列につなぐ。
 
 - 未確定の選択は保存しない。復帰は常に確定済み回答の次の問題から始まる。
-- 保存済みデータは次の場合に復帰させず破棄する: `schemaVersion` 不一致、
-  教材パックの版違い、出題順の不一致、存在しない問題・選択肢の参照、同一問題の重複回答。
+- 保存データは出題計画（出題順と選択肢順）ごと保存する。復帰後も離脱前と同じ並びで続く。
+- 保存済みデータは次の場合に復帰させず破棄する: 対応外の `schemaVersion`、
+  教材パックの版違い、存在しない問題・選択肢の参照、同一問題の重複回答。
+- `schemaVersion = 1` の保存データは、選択肢順を持たないため教材の原稿順で復帰する。
 - 保存ファイルが壊れている場合は `LearningSessionStoreError.corruptedData` として扱い、
   破棄して新規セッションから始められる状態へ戻す。
 - 保存に失敗した場合は学習画面に警告を表示する。失敗を黙って握りつぶさない。
@@ -246,6 +263,7 @@ audio-manifest.json
 - オーディオセッションの中断（電話・Siri 等）を購読し、中断は失敗として表示しない。
 - 端末にインドネシア語の音声が無い場合は、追加方法を案内する文言を表示する。
 - 発話の区切りを `onSpeechMark` で通知し、キャラクターの口の動きへ同期させる。
+- 会話問題は発話を話者ごとに分けて順に再生する。話者は声と音高で区別する。
 
 実音声アセットへ移行するときは、同じプロトコルの別実装を用意し、
 `prepare(_:)` を次問の先読みに使う。
@@ -304,12 +322,33 @@ audio-manifest.json
 
 ### UIテスト
 
-- オンボーディングから最初の20問完了
-- 10問時の中間結果、20問時の総合結果
-- アプリ再起動後の途中復帰
-- 日本語・インドネシア語
-- Dynamic Type最大付近、VoiceOver用ラベル
+`KenteiUITests` ターゲットで、単体テストでは追えない画面遷移を実操作で確認する。
+
+実装済み:
+
+| テスト | 確認内容 |
+| --- | --- |
+| 20問の通し | 10問で中間結果、20問で総合結果へ到達する |
+| 区切りの挙動 | 中間結果で次の問題を読み込まない（音声操作を出さない） |
+| 回答前の露出 | 回答するまで問題文を画面へ出さない |
+| 解説 | 回答直後に解説が前面へ出て、そこから次へ進める |
+| 離脱と復帰 | 途中でアプリを終了しても、最後に回答した問題の次から再開する |
+| 初回導入 | 導入を通して音声確認まで進む |
+
+未実装:
+
+- 日本語・インドネシア語の切替
+- Dynamic Type最大付近、VoiceOver操作
 - オフライン10問と再接続同期
+
+UIテストを決まった状態から始めるため、アプリは次の起動引数を受け付ける。
+
+| 引数 | 効果 |
+| --- | --- |
+| `-resetLearningData` | 保存済みの学習データと初回導入の結果を消す |
+| `-skipOnboarding` | 保存は本物のまま、初回導入だけ済んだ状態にする |
+| `-showHome` / `-showLearningSession` / `-showFeedback` / `-showMidpointResult` / `-showFinalResult` / `-showAtlas` | 決まった画面を直接開く（保存に依存しない） |
+| `-onboardingStep <番号>` | 初回導入の途中手順から開く |
 
 ### 実機確認
 
@@ -318,3 +357,15 @@ audio-manifest.json
 - 電話・Siri等による中断と復帰
 - 録音導入後のマイク権限と録音品質
 
+
+## 13. 初回導入
+
+`OnboardingView` が仕様の6手順（目的の説明、UI言語、学習目的、目標級と経験、
+音声の聞こえ確認、最初のセッションへ）を担う。
+
+- 受け取った内容は `LearnerProfile` として `LearnerProfileStoring` 経由で保存する。
+- 保存済みなら次回以降は表示しない。壊れた保存値は初回導入からやり直す。
+- UI言語の選択は `environment(\.locale)` として全画面へ適用する。
+- 音声の聞こえ確認は学習と同じ再生実装を使い、聞こえなかった場合の対処を案内する。
+  聞こえなくても学習へ進める。導入で行き止まりを作らない。
+- 画面確認用に `-onboardingStep <番号>` で途中の手順から起動できる。

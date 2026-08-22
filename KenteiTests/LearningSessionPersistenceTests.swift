@@ -65,21 +65,26 @@ final class LearningSessionPersistenceTests: XCTestCase {
 
     // MARK: - 保存形式の互換性契約
 
-    func testStoredSchemaVersionOneRemainsReadable() throws {
+    func testSchemaVersionOneMigratesToCanonicalChoiceOrder() throws {
+        let pack = DemoLearningContent.pack
+        let firstQuestion = try XCTUnwrap(pack.questions.first)
+        let questionIDList = pack.questions.prefix(3).map { "\"\($0.id.rawValue)\"" }.joined(separator: ", ")
+
+        // v1 は出題順だけを保存し、選択肢順を持たない。
         let json = """
         {
           "answers": [
             {
               "answeredAt": "2023-11-14T22:13:20Z",
               "audioPlayCount": 2,
-              "choiceID": "demo-question-1-choice-1",
+              "choiceID": "\(firstQuestion.correctChoiceID.rawValue)",
               "isCorrect": true,
-              "questionID": "demo-question-1"
+              "questionID": "\(firstQuestion.id.rawValue)"
             }
           ],
-          "contentVersion": "\(DemoLearningContent.version)",
+          "contentVersion": "\(pack.version)",
           "phase": "answering",
-          "questionIDs": ["demo-question-1"],
+          "questionIDs": [\(questionIDList)],
           "schemaVersion": 1,
           "sessionID": "00000000-0000-0000-0000-0000000000AA",
           "startedAt": "2023-11-14T22:13:20Z",
@@ -91,11 +96,37 @@ final class LearningSessionPersistenceTests: XCTestCase {
         decoder.dateDecodingStrategy = .iso8601
         let snapshot = try decoder.decode(LearningSessionSnapshot.self, from: Data(json.utf8))
 
-        XCTAssertEqual(snapshot.schemaVersion, LearningSessionSnapshot.currentSchemaVersion)
-        XCTAssertEqual(snapshot.answers.count, 1)
-        XCTAssertEqual(snapshot.answers[0].questionID, QuestionID(rawValue: "demo-question-1"))
-        XCTAssertEqual(snapshot.answers[0].audioPlayCount, 2)
-        XCTAssertEqual(snapshot.phase, .answering)
+        XCTAssertEqual(snapshot.schemaVersion, 1)
+        XCTAssertEqual(snapshot.plan.entries.count, 3)
+        XCTAssertNil(snapshot.plan.entries[0].choiceIDs, "v1は選択肢順を持たない")
+
+        let state = try LearningSessionState.restored(from: snapshot, contentPack: pack)
+
+        XCTAssertEqual(state.answeredCount, 1)
+        XCTAssertEqual(state.questions.count, 3)
+        XCTAssertEqual(
+            state.questions[0].choices.map(\.id),
+            firstQuestion.choices.map(\.id),
+            "選択肢順が無い保存データは教材の原稿順で復帰する"
+        )
+    }
+
+    func testCurrentSchemaVersionRoundTripsThroughJSON() throws {
+        let snapshot = Self.makeSnapshot(answeredCount: 2)
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        let restored = try decoder.decode(
+            LearningSessionSnapshot.self,
+            from: try encoder.encode(snapshot)
+        )
+
+        XCTAssertEqual(restored, snapshot)
+        XCTAssertEqual(restored.schemaVersion, 2)
+        XCTAssertNotNil(restored.plan.entries.first?.choiceIDs, "v2は選択肢順を保存する")
     }
 
     // MARK: - 復帰
@@ -118,7 +149,7 @@ final class LearningSessionPersistenceTests: XCTestCase {
             schemaVersion: LearningSessionSnapshot.currentSchemaVersion + 1,
             sessionID: base.sessionID,
             contentVersion: base.contentVersion,
-            questionIDs: base.questionIDs,
+            plan: base.plan,
             answers: base.answers,
             phase: base.phase,
             startedAt: base.startedAt,
@@ -140,7 +171,7 @@ final class LearningSessionPersistenceTests: XCTestCase {
         let snapshot = LearningSessionSnapshot(
             sessionID: base.sessionID,
             contentVersion: "another-pack",
-            questionIDs: base.questionIDs,
+            plan: base.plan,
             answers: base.answers,
             phase: base.phase,
             startedAt: base.startedAt,
@@ -157,13 +188,16 @@ final class LearningSessionPersistenceTests: XCTestCase {
         }
     }
 
-    func testRestoreRejectsDifferentQuestionOrder() throws {
+    func testRestoreRejectsPlanReferencingUnknownQuestion() throws {
         let base = Self.makeSnapshot(answeredCount: 1)
+        let brokenPlan = LearningSessionPlan(
+            entries: [LearningSessionPlan.Entry(questionID: QuestionID(rawValue: "missing"), choiceIDs: nil)]
+        )
         let snapshot = LearningSessionSnapshot(
             sessionID: base.sessionID,
             contentVersion: base.contentVersion,
-            questionIDs: base.questionIDs.reversed(),
-            answers: base.answers,
+            plan: brokenPlan,
+            answers: [],
             phase: base.phase,
             startedAt: base.startedAt,
             updatedAt: base.updatedAt
@@ -176,13 +210,28 @@ final class LearningSessionPersistenceTests: XCTestCase {
         }
     }
 
+    func testRestorePreservesShuffledChoiceOrder() throws {
+        let snapshot = Self.makeSnapshot(answeredCount: 2, seed: 77)
+
+        let state = try LearningSessionState.restored(from: snapshot, contentPack: DemoLearningContent.pack)
+
+        XCTAssertEqual(state.questions.map(\.id), snapshot.plan.questionIDs, "出題順を保って復帰する")
+        for (index, entry) in snapshot.plan.entries.enumerated() {
+            XCTAssertEqual(
+                state.questions[index].choices.map(\.id),
+                entry.choiceIDs,
+                "選択肢の並びも復帰する"
+            )
+        }
+    }
+
     func testRestoreRejectsDuplicatedAnswerForSameQuestion() throws {
         let base = Self.makeSnapshot(answeredCount: 1)
         let duplicated = base.answers + base.answers
         let snapshot = LearningSessionSnapshot(
             sessionID: base.sessionID,
             contentVersion: base.contentVersion,
-            questionIDs: base.questionIDs,
+            plan: base.plan,
             answers: duplicated,
             phase: base.phase,
             startedAt: base.startedAt,
@@ -194,7 +243,7 @@ final class LearningSessionPersistenceTests: XCTestCase {
         ) { error in
             XCTAssertEqual(
                 error as? LearningSessionRestoreFailure,
-                .duplicatedAnswer(QuestionID(rawValue: "demo-question-1"))
+                .duplicatedAnswer(base.plan.questionIDs[0])
             )
         }
     }
@@ -211,7 +260,7 @@ final class LearningSessionPersistenceTests: XCTestCase {
         let snapshot = LearningSessionSnapshot(
             sessionID: base.sessionID,
             contentVersion: base.contentVersion,
-            questionIDs: base.questionIDs,
+            plan: base.plan,
             answers: [brokenAnswer],
             phase: base.phase,
             startedAt: base.startedAt,
@@ -227,11 +276,14 @@ final class LearningSessionPersistenceTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private static func makeSnapshot(answeredCount: Int) -> LearningSessionSnapshot {
+    private static func makeSnapshot(answeredCount: Int, seed: UInt64 = 3) -> LearningSessionSnapshot {
         let pack = DemoLearningContent.pack
+        let plan = TestSession.makePlan(seed: seed, pack: pack)
         let date = Date(timeIntervalSince1970: 1_700_000_000)
-        let answers = pack.questions.prefix(answeredCount).map { question in
-            AnsweredQuestion(
+
+        let answers = plan.entries.prefix(answeredCount).compactMap { entry -> AnsweredQuestion? in
+            guard let question = pack.question(with: entry.questionID) else { return nil }
+            return AnsweredQuestion(
                 questionID: question.id,
                 choiceID: question.correctChoiceID,
                 isCorrect: true,
@@ -243,7 +295,7 @@ final class LearningSessionPersistenceTests: XCTestCase {
         return LearningSessionSnapshot(
             sessionID: UUID(uuidString: "00000000-0000-0000-0000-0000000000AA")!,
             contentVersion: pack.version,
-            questionIDs: pack.questions.map(\.id),
+            plan: plan,
             answers: Array(answers),
             phase: .answering,
             startedAt: date,

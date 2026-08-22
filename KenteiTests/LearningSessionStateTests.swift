@@ -50,40 +50,36 @@ final class LearningSessionStateTests: XCTestCase {
 
     // MARK: - 教材の作り
 
-    func testCorrectAnswerPositionIsNotBiased() throws {
+    func testContentPackHasEnoughDistinctQuestions() {
         let questions = DemoLearningContent.pack.questions
 
-        let positions = try questions.map { question in
-            try XCTUnwrap(question.choices.firstIndex { $0.id == question.correctChoiceID })
-        }
-
-        XCTAssertEqual(
-            Set(positions).count,
-            4,
-            "正解が特定の位置に偏ると、聞き取らずに当てられてしまう"
+        XCTAssertGreaterThanOrEqual(
+            questions.count,
+            LearningSessionPlanner.defaultQuestionCount * 2,
+            "毎回同じ20問にならないよう、出題数の倍以上の教材を持つ"
         )
-        for position in 0..<4 {
-            XCTAssertGreaterThanOrEqual(
-                positions.count(where: { $0 == position }),
-                2,
-                "位置 \(position) の正解が少なすぎる"
-            )
-        }
-    }
-
-    func testEveryDemoQuestionIsDistinct() {
-        let questions = DemoLearningContent.pack.questions
-
-        XCTAssertEqual(questions.count, 20)
         XCTAssertEqual(Set(questions.map(\.id)).count, questions.count, "問題IDが重複しない")
         XCTAssertEqual(
             Set(questions.map(\.transcript)).count,
             questions.count,
-            "1セッション内で同じ音声を繰り返さない"
+            "同じ音声の問題を重複して持たない"
         )
     }
 
-    func testEveryDemoQuestionHasFourDistinctChoicesIncludingTheCorrectOne() {
+    func testContentPackIncludesConversationQuestions() {
+        let conversations = DemoLearningContent.pack.questions.filter(\.isConversation)
+
+        XCTAssertGreaterThanOrEqual(conversations.count, 5, "会話形式の問題を用意する")
+        for question in conversations {
+            XCTAssertEqual(
+                Set(question.utterances.map(\.speakerIndex)).count,
+                2,
+                "\(question.id.rawValue): 会話は2話者で構成する"
+            )
+        }
+    }
+
+    func testEveryQuestionHasFourDistinctChoicesIncludingTheCorrectOne() {
         for question in DemoLearningContent.pack.questions {
             XCTAssertEqual(question.choices.count, 4, "\(question.id.rawValue)")
             XCTAssertEqual(
@@ -101,6 +97,77 @@ final class LearningSessionStateTests: XCTestCase {
                 "\(question.id.rawValue): 正解が選択肢に含まれる"
             )
             XCTAssertFalse(question.explanation.isEmpty, "\(question.id.rawValue): 解説が必要")
+            XCTAssertFalse(question.utterances.isEmpty, "\(question.id.rawValue): 音声原稿が必要")
+        }
+    }
+
+    // MARK: - 出題と選択肢のランダム化
+
+    func testPlanSelectsRequestedNumberOfQuestionsWithoutDuplication() {
+        let plan = TestSession.makePlan(seed: 42)
+
+        XCTAssertEqual(plan.entries.count, LearningSessionPlanner.defaultQuestionCount)
+        XCTAssertEqual(
+            Set(plan.questionIDs).count,
+            plan.entries.count,
+            "1セッション内に同じ問題を二度出さない"
+        )
+    }
+
+    func testDifferentSessionsGetDifferentQuestionAndChoiceOrder() throws {
+        let first = try TestSession.makeState(seed: 1)
+        let second = try TestSession.makeState(seed: 2)
+
+        XCTAssertNotEqual(
+            first.questions.map(\.id),
+            second.questions.map(\.id),
+            "セッションごとに出題順が変わる"
+        )
+
+        let firstChoiceOrders = Dictionary(
+            uniqueKeysWithValues: first.questions.map { ($0.id, $0.choices.map(\.id)) }
+        )
+        let changedChoiceOrders = second.questions.filter { question in
+            guard let previous = firstChoiceOrders[question.id] else { return false }
+            return previous != question.choices.map(\.id)
+        }
+        XCTAssertFalse(changedChoiceOrders.isEmpty, "選択肢の並びもセッションごとに変わる")
+    }
+
+    func testSameSeedReproducesSameSession() throws {
+        let first = try TestSession.makeState(seed: 99)
+        let second = try TestSession.makeState(seed: 99)
+
+        XCTAssertEqual(first.questions.map(\.id), second.questions.map(\.id))
+        XCTAssertEqual(
+            first.questions.map { $0.choices.map(\.id) },
+            second.questions.map { $0.choices.map(\.id) }
+        )
+    }
+
+    func testCorrectAnswerIsNotAlwaysInTheSamePosition() throws {
+        let session = try TestSession.makeState(seed: 2026)
+
+        let positions = try session.questions.map { question in
+            try XCTUnwrap(question.choices.firstIndex { $0.id == question.correctChoiceID })
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            Set(positions).count,
+            3,
+            "正解の位置が偏ると、聞き取らずに当てられてしまう"
+        )
+    }
+
+    func testShuffledChoicesKeepTheCorrectAnswerAvailable() throws {
+        let session = try TestSession.makeState(seed: 5)
+
+        for question in session.questions {
+            XCTAssertTrue(
+                question.choices.contains { $0.id == question.correctChoiceID },
+                "\(question.id.rawValue): 並び替え後も正解が選べる"
+            )
+            XCTAssertEqual(question.choices.count, 4)
         }
     }
 

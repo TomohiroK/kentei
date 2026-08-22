@@ -34,6 +34,11 @@ struct LearningSessionContainer: View {
                 )
             }
         }
+        .onChange(of: model.state.phase) { _, phase in
+            // 区切り・結果へ移ったら、鳴っている音声も予約された再生も打ち切る。
+            guard phase != .answering else { return }
+            model.stopAudio()
+        }
         .confirmationDialog(
             "session.exit.title",
             isPresented: $isShowingExitConfirmation,
@@ -53,6 +58,9 @@ private struct QuestionScreen: View {
     let model: LearningSessionModel
     let onRequestExit: () -> Void
 
+    /// 回答直後に出す解説。下へスクロールしないと読めない位置には置かない。
+    @State private var feedbackQuestion: LearningQuestion?
+
     private var session: LearningSessionState { model.state }
 
     var body: some View {
@@ -61,26 +69,27 @@ private struct QuestionScreen: View {
 
             if let question = session.currentQuestion {
                 ScrollView {
-                    VStack(spacing: 22) {
-                        scenarioBadge(question.scenarioName)
+                    VStack(spacing: 12) {
+                        if model.hasPersistenceFailure {
+                            persistenceWarning
+                        }
 
-                        AudioPromptControl(model: model, questionID: question.id)
-                            .id(question.id)
+                        AudioPlaybackBar(
+                            model: model,
+                            questionID: question.id,
+                            scenarioName: question.scenarioName
+                        )
+                        .id(question.id)
 
                         choices(for: question)
-
-                        if session.submittedChoiceID != nil {
-                            feedback(for: question)
-                        }
                     }
                     .padding(.horizontal, KenteiTheme.horizontalPadding)
-                    .padding(.vertical, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 12)
                 }
+                .scrollBounceBehavior(.basedOnSize)
                 .safeAreaInset(edge: .bottom) {
                     bottomAction
-                }
-                .safeAreaInset(edge: .top) {
-                    persistenceWarning
                 }
             } else {
                 ContentUnavailableView(
@@ -91,10 +100,28 @@ private struct QuestionScreen: View {
             }
         }
         .background(KenteiTheme.skyBackground.ignoresSafeArea())
+        .sheet(item: $feedbackQuestion) { question in
+            AnswerFeedbackSheet(
+                question: question,
+                isCorrect: session.isSubmittedAnswerCorrect,
+                nextTitle: nextButtonTitle
+            ) {
+                feedbackQuestion = nil
+                model.advance()
+            }
+        }
+        .onAppear {
+            presentFeedbackIfAnswered()
+        }
+    }
+
+    private func presentFeedbackIfAnswered() {
+        guard session.submittedChoiceID != nil, feedbackQuestion == nil else { return }
+        feedbackQuestion = session.currentQuestion
     }
 
     private var sessionHeader: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             HStack {
                 Button(action: onRequestExit) {
                     Image(systemName: "xmark")
@@ -135,34 +162,32 @@ private struct QuestionScreen: View {
                         )
                 }
             }
-            .frame(height: 8)
+            .frame(height: 6)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("session.progress.label"))
             .accessibilityValue(Text("\(session.currentIndex + 1) / \(session.questions.count)"))
         }
         .padding(.horizontal, KenteiTheme.horizontalPadding)
-        .padding(.vertical, 10)
+        .padding(.bottom, 10)
         .background(KenteiTheme.elevatedSurface)
     }
 
-    private func scenarioBadge(_ scenario: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "location.fill")
-            Text(scenario)
-        }
-        .font(.subheadline.weight(.semibold))
-        .foregroundStyle(KenteiTheme.brandPrimary)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .background(KenteiTheme.brandPrimarySoft, in: Capsule())
-        .accessibilityElement(children: .combine)
+    private var persistenceWarning: some View {
+        Label("session.saveFailed", systemImage: "exclamationmark.triangle.fill")
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(KenteiTheme.error)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(KenteiTheme.error.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .accessibilityElement(children: .combine)
     }
 
     private func choices(for question: LearningQuestion) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("session.chooseAnswer")
-                .font(.title3.bold())
-                .foregroundStyle(KenteiTheme.textPrimary)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(KenteiTheme.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             ForEach(Array(question.choices.enumerated()), id: \.element.id) { index, choice in
@@ -178,58 +203,41 @@ private struct QuestionScreen: View {
         }
     }
 
-    private func feedback(for question: LearningQuestion) -> some View {
-        KenteiCard {
-            VStack(alignment: .leading, spacing: 14) {
-                if session.isSubmittedAnswerCorrect {
-                    Label("session.correct", systemImage: "checkmark.circle.fill")
-                        .font(.title3.bold())
-                        .foregroundStyle(KenteiTheme.success)
-                } else {
-                    Label("session.incorrect", systemImage: "arrow.counterclockwise.circle.fill")
-                        .font(.title3.bold())
-                        .foregroundStyle(KenteiTheme.error)
-                }
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("session.transcript")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(KenteiTheme.textSecondary)
-                    Text(question.transcript)
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(KenteiTheme.textPrimary)
-                }
-
-                Text(question.explanation)
-                    .font(.body)
-                    .foregroundStyle(KenteiTheme.textSecondary)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var persistenceWarning: some View {
-        if model.hasPersistenceFailure {
-            Label("session.saveFailed", systemImage: "exclamationmark.triangle.fill")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(KenteiTheme.error)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, KenteiTheme.horizontalPadding)
-                .padding(.vertical, 8)
-                .background(KenteiTheme.error.opacity(0.10))
-                .accessibilityElement(children: .combine)
-        }
+    /// 会話の話者を短い記号で示す。誰の発話かを色だけに頼らず伝える。
+    private func speakerLabel(for speakerIndex: Int) -> String {
+        let symbols = ["A", "B", "C"]
+        return symbols[speakerIndex % symbols.count]
     }
 
     private var bottomAction: some View {
-        VStack(spacing: 0) {
-            Divider()
+        VStack(spacing: 10) {
+            // 正誤は常に見える位置に置く。選択肢まで戻らせない。
+            if session.submittedChoiceID != nil {
+                HStack(spacing: 8) {
+                    Image(systemName: session.isSubmittedAnswerCorrect
+                          ? "checkmark.circle.fill"
+                          : "arrow.counterclockwise.circle.fill")
+                    Text(session.isSubmittedAnswerCorrect ? "session.correct" : "session.incorrect")
+                }
+                .font(.headline)
+                .foregroundStyle(session.isSubmittedAnswerCorrect ? KenteiTheme.success : KenteiTheme.error)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .combine)
+                .overlay(alignment: .trailing) {
+                    Button("session.showExplanation") {
+                        feedbackQuestion = session.currentQuestion
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(KenteiTheme.brandPrimary)
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier("session.showExplanation")
+                }
+            }
 
             if session.submittedChoiceID == nil {
                 Button("session.submit") {
                     model.submit()
+                    presentFeedbackIfAnswered()
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(session.selectedChoiceID == nil)
@@ -243,9 +251,9 @@ private struct QuestionScreen: View {
             }
         }
         .padding(.horizontal, KenteiTheme.horizontalPadding)
-        .padding(.top, 12)
+        .padding(.top, 10)
         .padding(.bottom, 8)
-        .background(.regularMaterial)
+        .background(.bar)
     }
 
     private var nextButtonTitle: LocalizedStringKey {
@@ -259,12 +267,15 @@ private struct QuestionScreen: View {
     }
 }
 
-private struct AudioPromptControl: View {
+/// 音声再生の操作。問題画面では選択肢と同時に見える高さに収める。
+private struct AudioPlaybackBar: View {
     let model: LearningSessionModel
     let questionID: QuestionID
+    let scenarioName: String
 
     @AppStorage(LearningPreferenceKey.playbackRate) private var storedRate = PlaybackRate.standard.rawValue
     @AppStorage(LearningPreferenceKey.autoplay) private var isAutoplayEnabled = true
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var rate: PlaybackRate {
         PlaybackRate(rawValue: storedRate) ?? .standard
@@ -275,51 +286,46 @@ private struct AudioPromptControl: View {
     }
 
     var body: some View {
-        KenteiCard {
-            VStack(spacing: 16) {
-                LearningCompanionView(
-                    expression: isPlaying ? .thinking : .normal,
-                    size: 92,
-                    isSpeaking: isPlaying,
-                    speechPulse: model.speechPulse
-                )
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 14) {
+                playButton
 
-                Button {
-                    model.playCurrentQuestion(rate: rate)
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(KenteiTheme.brandPrimary)
-                            .frame(width: 84, height: 84)
-                            .shadow(color: KenteiTheme.brandPrimary.opacity(0.25), radius: 12, y: 7)
-                        Image(systemName: isPlaying ? "waveform" : "play.fill")
-                            .font(.system(size: 30, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
-                }
-                .accessibilityLabel(Text(isPlaying ? "session.audio.playing" : "session.audio.play"))
-                .accessibilityValue(Text("\(model.state.audioPlayCount)"))
-                .accessibilityIdentifier("session.playAudio")
-
-                ratePicker
-
-                VStack(spacing: 4) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(isPlaying ? "session.audio.listening" : "session.audio.instruction")
                         .font(.headline)
                         .foregroundStyle(KenteiTheme.textPrimary)
-                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    ratePicker
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            HStack(spacing: 8) {
+                Label(scenarioName, systemImage: "location.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(KenteiTheme.brandPrimary)
+                    .accessibilityElement(children: .combine)
+
+                Spacer(minLength: 8)
+
+                // 大きい文字設定では補助文が選択肢を押し出すため、操作に必要な要素だけ残す。
+                if !dynamicTypeSize.isAccessibilitySize {
                     Text("session.audio.noTextHint")
                         .font(.caption)
                         .foregroundStyle(KenteiTheme.textSecondary)
-                        .multilineTextAlignment(.center)
+                        .multilineTextAlignment(.trailing)
                 }
-
-                audioFailureMessage
             }
-            .frame(maxWidth: .infinity)
+
+            audioFailureMessage
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .kenteiCard()
         .task(id: questionID) {
-            guard isAutoplayEnabled else { return }
+            guard isAutoplayEnabled, model.state.phase == .answering else { return }
             model.playCurrentQuestion(rate: rate)
         }
         .onDisappear {
@@ -327,7 +333,28 @@ private struct AudioPromptControl: View {
         }
     }
 
-    /// E級教材のみ 0.8 倍を許容する。標準速度を既定にして、基準記録が遅い速度に寄らないようにする。
+    private var playButton: some View {
+        Button {
+            model.playCurrentQuestion(rate: rate)
+        } label: {
+            ZStack {
+                Circle()
+                    .fill(KenteiTheme.brandPrimary)
+                    .frame(width: 68, height: 68)
+                    .shadow(color: KenteiTheme.brandPrimary.opacity(0.22), radius: 10, y: 5)
+
+                Image(systemName: isPlaying ? "waveform" : "play.fill")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(.white)
+                    .symbolEffect(.variableColor.iterative, options: .repeating, isActive: isPlaying)
+            }
+        }
+        .accessibilityLabel(Text(isPlaying ? "session.audio.playing" : "session.audio.play"))
+        .accessibilityValue(Text("\(model.state.audioPlayCount)"))
+        .accessibilityIdentifier("session.playAudio")
+    }
+
+    /// E級教材のみ 0.8 倍を許容する。標準速度を既定にする。
     private var ratePicker: some View {
         Picker("session.audio.rate", selection: $storedRate) {
             ForEach(PlaybackRate.allCases, id: \.rawValue) { option in
@@ -335,7 +362,8 @@ private struct AudioPromptControl: View {
             }
         }
         .pickerStyle(.segmented)
-        .frame(maxWidth: 220)
+        .labelsHidden()
+        .frame(maxWidth: 168)
         .accessibilityIdentifier("session.audioRate")
     }
 
@@ -348,7 +376,7 @@ private struct AudioPromptControl: View {
             )
             .font(.footnote.weight(.semibold))
             .foregroundStyle(KenteiTheme.error)
-            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
         }
@@ -384,17 +412,18 @@ private struct AnswerChoiceRow: View {
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: 14) {
+            HStack(spacing: 12) {
                 Text(choiceLetter)
                     .font(.subheadline.bold())
                     .foregroundStyle(isSelected ? .white : KenteiTheme.textSecondary)
-                    .frame(width: 34, height: 34)
+                    .frame(width: 30, height: 30)
                     .background(isSelected ? KenteiTheme.brandPrimary : KenteiTheme.brandPrimarySoft, in: Circle())
 
                 Text(choice.text)
                     .font(.body.weight(.medium))
                     .foregroundStyle(KenteiTheme.textPrimary)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Spacer(minLength: 8)
 
@@ -406,8 +435,9 @@ private struct AnswerChoiceRow: View {
                         .foregroundStyle(KenteiTheme.error)
                 }
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
             .background(backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay {
@@ -558,5 +588,104 @@ private struct FinalResultView: View {
             .padding(.vertical, 30)
         }
         .background(KenteiTheme.skyBackground.ignoresSafeArea())
+    }
+}
+
+/// 回答直後の解説。正誤、聞こえた文、解説、次への導線をひとまとめにして前面に出す。
+private struct AnswerFeedbackSheet: View {
+    let question: LearningQuestion
+    let isCorrect: Bool
+    let nextTitle: LocalizedStringKey
+    let onNext: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    verdict
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("session.transcript")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KenteiTheme.textSecondary)
+
+                        transcript
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("session.explanation")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KenteiTheme.textSecondary)
+
+                        Text(question.explanation)
+                            .font(.body)
+                            .foregroundStyle(KenteiTheme.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, KenteiTheme.horizontalPadding)
+                .padding(.top, 22)
+                .padding(.bottom, 16)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+
+            Button(nextTitle, action: onNext)
+                .buttonStyle(PrimaryButtonStyle())
+                .padding(.horizontal, KenteiTheme.horizontalPadding)
+                .padding(.bottom, 12)
+                .accessibilityIdentifier("session.feedbackNext")
+        }
+        .background(KenteiTheme.skyBackground.ignoresSafeArea())
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    /// 正誤は記号と文言の両方で示し、色だけに頼らない。
+    private var verdict: some View {
+        HStack(spacing: 10) {
+            Image(systemName: isCorrect ? "checkmark.circle.fill" : "arrow.counterclockwise.circle.fill")
+                .font(.title)
+            Text(isCorrect ? "session.correct" : "session.incorrect")
+                .font(.title2.bold())
+        }
+        .foregroundStyle(isCorrect ? KenteiTheme.success : KenteiTheme.error)
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var transcript: some View {
+        transcriptContent
+            .accessibilityIdentifier("session.transcriptValue")
+    }
+
+    @ViewBuilder
+    private var transcriptContent: some View {
+        if question.isConversation {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(question.utterances.enumerated()), id: \.offset) { _, utterance in
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(speakerLabel(for: utterance.speakerIndex))
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(KenteiTheme.brandPrimary)
+                            .frame(minWidth: 22, alignment: .leading)
+                        Text(utterance.text)
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(KenteiTheme.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        } else {
+            Text(question.transcript)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(KenteiTheme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func speakerLabel(for speakerIndex: Int) -> String {
+        let symbols = ["A", "B", "C"]
+        return symbols[speakerIndex % symbols.count]
     }
 }

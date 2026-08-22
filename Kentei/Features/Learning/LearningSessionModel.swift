@@ -53,15 +53,23 @@ final class LearningSessionModel: Identifiable {
         }
     }
 
+    /// 出題順と選択肢順を毎回引き直して、新しいセッションを始める。
     static func newSession(
         contentPack: LearningContentPack,
         store: any LearningSessionStoring,
         audioPlayer: any QuestionAudioPlaying,
         clock: any SessionClock,
-        identifierGenerator: any IdentifierGenerating
+        identifierGenerator: any IdentifierGenerating,
+        randomProvider: any RandomGeneratorProviding
     ) -> LearningSessionModel {
-        LearningSessionModel(
-            state: LearningSessionState(contentPack: contentPack),
+        var generator = randomProvider.makeGenerator()
+        let plan = LearningSessionPlanner.makePlan(from: contentPack, using: &generator)
+        // 計画は教材パックそのものから作るため食い違わない。万一に備え原稿順へ落とす。
+        let state = (try? LearningSessionState(contentPack: contentPack, plan: plan))
+            ?? LearningSessionState(contentPack: contentPack)
+
+        return LearningSessionModel(
+            state: state,
             store: store,
             audioPlayer: audioPlayer,
             clock: clock,
@@ -75,8 +83,11 @@ final class LearningSessionModel: Identifiable {
     }
 
     /// 現在の問題の音声を再生する。連打しても多重再生にならないよう、前の再生を止めてから始める。
+    ///
+    /// 回答中以外では鳴らさない。区切りや結果の画面へ切り替わる途中で問題画面が
+    /// 新しい問題として再評価されても、次の問題の音声が先走らないようにする。
     func playCurrentQuestion(rate: PlaybackRate) {
-        guard let question = state.currentQuestion else { return }
+        guard state.phase == .answering, let question = state.currentQuestion else { return }
 
         playbackTask?.cancel()
         audioPlayer.stop()
@@ -87,13 +98,17 @@ final class LearningSessionModel: Identifiable {
             // 開始前に次の再生へ置き換えられた場合は、鳴らさず数えない。
             guard !Task.isCancelled else { return }
             do {
-                try await audioPlayer.play(
-                    QuestionAudioRequest(
-                        questionID: question.id,
-                        text: question.transcript,
-                        rate: rate
+                // 会話問題は話者ごとの発話を順に鳴らす。単独発話は1件だけ。
+                for utterance in question.utterances {
+                    try await audioPlayer.play(
+                        QuestionAudioRequest(
+                            questionID: question.id,
+                            text: utterance.text,
+                            speakerIndex: utterance.speakerIndex,
+                            rate: rate
+                        )
                     )
-                )
+                }
                 // 再生が実際に始まった場合だけ数える。開始に失敗した試行は学習イベントにしない。
                 state.registerAudioPlayback()
                 audioState = .idle
@@ -167,9 +182,16 @@ final class LearningSessionModel: Identifiable {
     /// 次問の音声を用意する。実音声アセット実装ではここが先読みになる。
     private func prepareNextQuestionAudio() {
         guard let question = state.currentQuestion else { return }
-        audioPlayer.prepare(
-            QuestionAudioRequest(questionID: question.id, text: question.transcript, rate: .standard)
-        )
+        for utterance in question.utterances {
+            audioPlayer.prepare(
+                QuestionAudioRequest(
+                    questionID: question.id,
+                    text: utterance.text,
+                    speakerIndex: utterance.speakerIndex,
+                    rate: .standard
+                )
+            )
+        }
     }
 
     private func persist() {

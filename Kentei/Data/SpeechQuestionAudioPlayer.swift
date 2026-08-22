@@ -42,7 +42,9 @@ final class SpeechQuestionAudioPlayer: NSObject, QuestionAudioPlaying {
         let utterance = AVSpeechUtterance(string: request.text)
         utterance.voice = voice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * Float(request.rate.rawValue)
-        utterance.postUtteranceDelay = 0
+        // 端末にインドネシア語の音声が1つしか無い場合でも、会話問題の話者を聞き分けられるようにする。
+        utterance.pitchMultiplier = Self.pitchMultiplier(for: request.speakerIndex)
+        utterance.postUtteranceDelay = request.speakerIndex > 0 ? 0 : 0.15
 
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
@@ -99,6 +101,10 @@ final class SpeechQuestionAudioPlayer: NSObject, QuestionAudioPlaying {
         } else {
             continuation.resume()
         }
+    }
+
+    private static func pitchMultiplier(for speakerIndex: Int) -> Float {
+        speakerIndex % 2 == 0 ? 1.0 : 0.82
     }
 
     private static func voice(for speakerIndex: Int) -> AVSpeechSynthesisVoice? {

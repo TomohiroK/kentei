@@ -1,12 +1,56 @@
 import SwiftUI
+import UIKit
 
-enum CompanionExpression: Sendable {
+enum CompanionExpression: String, CaseIterable, Sendable {
     case normal
     case happy
     case surprised
     case thinking
     case celebrate
     case encourage
+
+    /// 表情ごとの正式素材名。素材が入ればコード変更なしで使われる。
+    var preferredAssetName: String {
+        switch self {
+        case .normal: "CompanionNormal"
+        case .happy: "CompanionHappy"
+        case .surprised: "CompanionSurprised"
+        case .thinking: "CompanionThinking"
+        case .celebrate: "CompanionCelebrate"
+        case .encourage: "CompanionEncourage"
+        }
+    }
+
+    /// 正式素材が揃うまでの代替。表情の意味が最も近い既存素材を選ぶ。
+    var fallbackAssetName: String {
+        switch self {
+        case .normal, .thinking: "CompanionListening"
+        case .happy, .celebrate: "CompanionHappy"
+        case .surprised, .encourage: "CompanionEncourage"
+        }
+    }
+
+    /// 口の開閉オーバーレイを重ねてよいのは、口を閉じた正面ポーズのときだけ。
+    var supportsMouthOverlay: Bool {
+        switch self {
+        case .normal, .thinking: true
+        case .happy, .celebrate, .surprised, .encourage: false
+        }
+    }
+}
+
+/// 表情から実際に使う素材名を決める。
+///
+/// 6表情の正式素材はまだ揃っていない。素材が Asset Catalog に入った時点で
+/// 自動的にそちらが使われ、無い間は意味の近い既存素材へ落とす。
+enum CompanionAssetResolver {
+    static func assetName(for expression: CompanionExpression) -> String {
+        isAvailable(expression.preferredAssetName) ? expression.preferredAssetName : expression.fallbackAssetName
+    }
+
+    static func isAvailable(_ assetName: String) -> Bool {
+        UIImage(named: assetName) != nil
+    }
 }
 
 struct PrimaryButtonStyle: ButtonStyle {
@@ -164,14 +208,7 @@ struct LearningCompanionView: View {
     @State private var tiltDirection: Double = 1
 
     private var assetName: String {
-        switch expression {
-        case .normal, .thinking:
-            "CompanionListening"
-        case .happy, .celebrate:
-            "CompanionHappy"
-        case .surprised, .encourage:
-            "CompanionEncourage"
-        }
+        CompanionAssetResolver.assetName(for: expression)
     }
 
     private var isAnimated: Bool {
@@ -252,7 +289,10 @@ struct LearningCompanionView: View {
     /// 位置と大きさは `CompanionListening` の造形に合わせた比率で、素材を差し替えるときは
     /// この比率も一緒に見直す。本来は口の開閉を含む表情差分素材で置き換える。
     private var showsMouthOverlay: Bool {
-        isSpeaking && assetName == "CompanionListening"
+        // 正式素材が口の開閉を持つ場合、オーバーレイは不要になる。
+        isSpeaking
+            && expression.supportsMouthOverlay
+            && !CompanionAssetResolver.isAvailable(expression.preferredAssetName)
     }
 
     private var mouthOpenAmount: CGFloat {

@@ -16,6 +16,22 @@ final class AppModel {
     }
 
     private(set) var resumeState: ResumeState = .unavailable
+    /// 初回導入で受け取った学習者の前提。未設定なら初回導入から始める。
+    private(set) var learnerProfile: LearnerProfile?
+
+    var needsOnboarding: Bool {
+        learnerProfile == nil
+    }
+
+    /// 表示言語。初回導入の選択を全画面へ適用する。
+    var interfaceLocale: Locale {
+        Locale(identifier: (learnerProfile?.interfaceLanguage ?? .systemDefault).localeIdentifier)
+    }
+
+    /// 初回導入の聞こえ確認で使う。学習セッションと同じ再生実装を共有する。
+    var sampleAudioPlayer: any QuestionAudioPlaying {
+        audioPlayer
+    }
 
     let contentPack: LearningContentPack
 
@@ -23,6 +39,8 @@ final class AppModel {
     private let audioPlayer: any QuestionAudioPlaying
     private let clock: any SessionClock
     private let identifierGenerator: any IdentifierGenerating
+    private let randomProvider: any RandomGeneratorProviding
+    private let profileStore: any LearnerProfileStoring
     private var restoredState: LearningSessionState?
     private var restoredSessionID: UUID?
     private var restoredStartedAt: Date?
@@ -32,24 +50,43 @@ final class AppModel {
         store: any LearningSessionStoring,
         audioPlayer: any QuestionAudioPlaying = SpeechQuestionAudioPlayer(),
         clock: any SessionClock = SystemSessionClock(),
-        identifierGenerator: any IdentifierGenerating = SystemIdentifierGenerator()
+        identifierGenerator: any IdentifierGenerating = SystemIdentifierGenerator(),
+        randomProvider: any RandomGeneratorProviding = SystemRandomGeneratorProvider(),
+        profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore()
     ) {
         self.contentPack = contentPack
         self.store = store
         self.audioPlayer = audioPlayer
         self.clock = clock
         self.identifierGenerator = identifierGenerator
+        self.randomProvider = randomProvider
+        self.profileStore = profileStore
+        learnerProfile = profileStore.load()
+    }
+
+    /// 初回導入の完了を保存する。以降の起動では導入を出さない。
+    func completeOnboarding(with profile: LearnerProfile) {
+        profileStore.save(profile)
+        learnerProfile = profile
     }
 
     /// 既定の保存先を用意できない場合でも学習は継続できるようにする。
-    static func live() -> AppModel {
+    static func live(profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore()) -> AppModel {
         let store: any LearningSessionStoring
         do {
             store = FileLearningSessionStore(fileURL: try FileLearningSessionStore.defaultFileURL())
         } catch {
             store = DisabledLearningSessionStore()
         }
-        return AppModel(store: store)
+        return AppModel(store: store, profileStore: profileStore)
+    }
+
+    /// 保存済みの学習データと初回導入の結果を消す。UIテストを決まった状態から始めるために使う。
+    func resetStoredLearningData() async {
+        try? await store.clear()
+        profileStore.clear()
+        learnerProfile = profileStore.load()
+        clearRestored()
     }
 
     /// 保存済みセッションを読み、現行教材へ復帰できるかを判定する。
@@ -87,7 +124,8 @@ final class AppModel {
             store: store,
             audioPlayer: audioPlayer,
             clock: clock,
-            identifierGenerator: identifierGenerator
+            identifierGenerator: identifierGenerator,
+            randomProvider: randomProvider
         )
     }
 

@@ -44,19 +44,96 @@ struct LearningChoice: Identifiable, Equatable, Sendable {
     let text: String
 }
 
+/// 出題音声の1発話。会話問題では話者を分けて複数持つ。
+struct ScriptedUtterance: Equatable, Sendable {
+    let speakerIndex: Int
+    let text: String
+}
+
 struct LearningQuestion: Identifiable, Equatable, Sendable {
     let id: QuestionID
-    let transcript: String
+    let utterances: [ScriptedUtterance]
+    /// 原稿順の選択肢。学習者に見える順序はセッションごとに決まる。
     let choices: [LearningChoice]
     let correctChoiceID: ChoiceID
     let explanation: String
     let scenarioName: String
+
+    /// 回答後に表示する本文。会話問題は話者ごとに行を分ける。
+    var transcript: String {
+        utterances.map(\.text).joined(separator: "\n")
+    }
+
+    var isConversation: Bool {
+        utterances.count > 1
+    }
+
+    func reordering(choiceIDs: [ChoiceID]) -> LearningQuestion? {
+        guard choiceIDs.count == choices.count else { return nil }
+
+        var reordered: [LearningChoice] = []
+        reordered.reserveCapacity(choiceIDs.count)
+        for choiceID in choiceIDs {
+            guard let choice = choices.first(where: { $0.id == choiceID }) else { return nil }
+            reordered.append(choice)
+        }
+
+        return LearningQuestion(
+            id: id,
+            utterances: utterances,
+            choices: reordered,
+            correctChoiceID: correctChoiceID,
+            explanation: explanation,
+            scenarioName: scenarioName
+        )
+    }
 }
 
 /// バージョン付きの教材パック。版が変わった保存データは復帰対象にしない。
 struct LearningContentPack: Equatable, Sendable {
     let version: String
     let questions: [LearningQuestion]
+
+    func question(with id: QuestionID) -> LearningQuestion? {
+        questions.first { $0.id == id }
+    }
+}
+
+/// セッション1回分の出題内容。出題順と選択肢の並びはここで確定する。
+struct LearningSessionPlan: Equatable, Sendable, Codable {
+    struct Entry: Equatable, Sendable, Codable {
+        let questionID: QuestionID
+        /// 表示順の選択肢。`nil` は教材の原稿順（保存形式v1からの復帰）を意味する。
+        let choiceIDs: [ChoiceID]?
+    }
+
+    let entries: [Entry]
+
+    var questionIDs: [QuestionID] {
+        entries.map(\.questionID)
+    }
+}
+
+/// 教材プールから、毎回異なる出題順と選択肢順のセッションを組み立てる。
+enum LearningSessionPlanner {
+    static let defaultQuestionCount = 20
+
+    static func makePlan(
+        from pack: LearningContentPack,
+        questionCount: Int = defaultQuestionCount,
+        using generator: inout some RandomNumberGenerator
+    ) -> LearningSessionPlan {
+        let selected = pack.questions.shuffled(using: &generator).prefix(questionCount)
+
+        let entries = selected.map { question in
+            LearningSessionPlan.Entry(
+                questionID: question.id,
+                choiceIDs: question.choices.map(\.id).shuffled(using: &generator)
+            )
+        }
+
+        return LearningSessionPlan(entries: Array(entries))
+    }
 }
 
 enum LearningSessionPhase: Equatable, Sendable {
@@ -69,6 +146,7 @@ struct LearningSessionState: Equatable, Sendable {
     static let checkpointQuestionCount = 10
 
     let contentVersion: String
+    /// 出題順・選択肢順を適用済みの問題。画面に見えるのはこの並びである。
     let questions: [LearningQuestion]
     private(set) var phase: LearningSessionPhase = .answering
     private(set) var currentIndex = 0
@@ -78,9 +156,38 @@ struct LearningSessionState: Equatable, Sendable {
     private(set) var answers: [AnsweredQuestion] = []
     private(set) var audioPlayCount = 0
 
+    private let plan: LearningSessionPlan
+
+    /// 教材の原稿順そのままのセッション。計画が教材と食い違わないため失敗しない。
     init(contentPack: LearningContentPack) {
         contentVersion = contentPack.version
         questions = contentPack.questions
+        plan = LearningSessionPlan(
+            entries: contentPack.questions.map { question in
+                LearningSessionPlan.Entry(
+                    questionID: question.id,
+                    choiceIDs: question.choices.map(\.id)
+                )
+            }
+        )
+    }
+
+    init(contentPack: LearningContentPack, plan: LearningSessionPlan) throws {
+        contentVersion = contentPack.version
+        self.plan = plan
+
+        questions = try plan.entries.map { entry in
+            guard let question = contentPack.question(with: entry.questionID) else {
+                throw LearningSessionRestoreFailure.questionSetMismatch
+            }
+            guard let choiceIDs = entry.choiceIDs else {
+                return question
+            }
+            guard let reordered = question.reordering(choiceIDs: choiceIDs) else {
+                throw LearningSessionRestoreFailure.unknownAnswerReference
+            }
+            return reordered
+        }
     }
 
     var currentQuestion: LearningQuestion? {
@@ -193,7 +300,7 @@ extension LearningSessionState {
         LearningSessionSnapshot(
             sessionID: sessionID,
             contentVersion: contentVersion,
-            questionIDs: questions.map(\.id),
+            plan: plan,
             answers: answers,
             phase: LearningSessionSnapshot.Phase(phase),
             startedAt: startedAt,
@@ -209,7 +316,7 @@ extension LearningSessionState {
         from snapshot: LearningSessionSnapshot,
         contentPack: LearningContentPack
     ) throws -> LearningSessionState {
-        guard snapshot.schemaVersion == LearningSessionSnapshot.currentSchemaVersion else {
+        guard LearningSessionSnapshot.supportedSchemaVersions.contains(snapshot.schemaVersion) else {
             throw LearningSessionRestoreFailure.unsupportedSchemaVersion(snapshot.schemaVersion)
         }
         guard snapshot.contentVersion == contentPack.version else {
@@ -218,16 +325,16 @@ extension LearningSessionState {
                 found: snapshot.contentVersion
             )
         }
-        guard snapshot.questionIDs == contentPack.questions.map(\.id) else {
-            throw LearningSessionRestoreFailure.questionSetMismatch
-        }
-        guard snapshot.answers.count <= contentPack.questions.count else {
+
+        var state = try LearningSessionState(contentPack: contentPack, plan: snapshot.plan)
+
+        guard snapshot.answers.count <= state.questions.count else {
             throw LearningSessionRestoreFailure.questionSetMismatch
         }
 
         var seenQuestionIDs: Set<QuestionID> = []
         for answer in snapshot.answers {
-            guard let question = contentPack.questions.first(where: { $0.id == answer.questionID }),
+            guard let question = state.questions.first(where: { $0.id == answer.questionID }),
                   question.choices.contains(where: { $0.id == answer.choiceID }) else {
                 throw LearningSessionRestoreFailure.unknownAnswerReference
             }
@@ -236,10 +343,9 @@ extension LearningSessionState {
             }
         }
 
-        var state = LearningSessionState(contentPack: contentPack)
         state.answers = snapshot.answers
         state.phase = snapshot.phase.domainPhase
-        state.currentIndex = min(snapshot.answers.count, max(contentPack.questions.count - 1, 0))
+        state.currentIndex = min(snapshot.answers.count, max(state.questions.count - 1, 0))
         return state
     }
 }
@@ -262,14 +368,18 @@ private extension LearningSessionSnapshot.Phase {
     }
 }
 
-// MARK: - プロトタイプ教材
+// MARK: - プレビューとテスト用
 
 extension LearningSessionState {
+    /// 決定的な並びのセッション。プレビュー・UIテストで使う。
     static var demo: LearningSessionState {
-        LearningSessionState(contentPack: DemoLearningContent.pack)
+        var generator = SeededRandomNumberGenerator(seed: 20_260_821)
+        let pack = DemoLearningContent.pack
+        let plan = LearningSessionPlanner.makePlan(from: pack, using: &generator)
+        return (try? LearningSessionState(contentPack: pack, plan: plan))
+            ?? LearningSessionState(contentPack: pack)
     }
 
-    /// UIテスト・プレビュー用に、指定数まで正解で埋めた状態を作る。
     static func demo(answeringCorrectly count: Int, at date: Date = Date(timeIntervalSince1970: 0)) -> LearningSessionState {
         var session = demo
         for _ in 0..<count {
@@ -284,6 +394,18 @@ extension LearningSessionState {
         return session
     }
 
+    /// 誤答を確定した直後の状態。解説ポップアップの画面確認に使う。
+    static var demoAnsweredIncorrectly: LearningSessionState {
+        var session = demo
+        guard let question = session.currentQuestion,
+              let wrongChoice = question.choices.first(where: { $0.id != question.correctChoiceID }) else {
+            return session
+        }
+        session.select(wrongChoice.id)
+        session.submit(at: Date(timeIntervalSince1970: 0))
+        return session
+    }
+
     static var demoMidpoint: LearningSessionState {
         var session = demo(answeringCorrectly: checkpointQuestionCount)
         session.phase = .midpoint
@@ -291,183 +413,6 @@ extension LearningSessionState {
     }
 
     static var demoFinalResult: LearningSessionState {
-        demo(answeringCorrectly: DemoLearningContent.questions.count)
-    }
-}
-
-enum DemoLearningContent {
-    /// 教材を差し替えたら版を上げる。版が変わると保存済みセッションは復帰せず破棄される。
-    static let version = "demo-2026-08-v2"
-
-    static var pack: LearningContentPack {
-        LearningContentPack(version: version, questions: questions)
-    }
-
-    /// 出題1件の原稿。`choices` の先頭を正解として書き、表示位置は `correctPositions` で散らす。
-    private struct Template: Sendable {
-        let transcript: String
-        /// 先頭が正解。残りは誤答で、いずれも聞き分けの理由がある選択肢にする。
-        let choices: [String]
-        let explanation: String
-        let scenarioName: String
-    }
-
-    /// 正解の表示位置。特定の位置に正解が偏ると、聞き取らずに当てられてしまう。
-    private static let correctPositions = [0, 2, 1, 3, 2, 0, 3, 1, 0, 2, 3, 1, 2, 0, 1, 3, 0, 2, 1, 3]
-
-    private static let templates: [Template] = [
-        Template(
-            transcript: "Selamat pagi.",
-            choices: ["おはようございます", "こんばんは", "おやすみなさい", "さようなら"],
-            explanation: "selamat はあいさつの頭に付き、pagi は朝を指します。",
-            scenarioName: "あいさつ"
-        ),
-        Template(
-            transcript: "Terima kasih banyak.",
-            choices: ["本当にありがとうございます", "どういたしまして", "すみません", "お願いします"],
-            explanation: "terima kasih が「ありがとう」、banyak が「たくさん」で感謝を強めます。",
-            scenarioName: "あいさつ"
-        ),
-        Template(
-            transcript: "Berapa harganya?",
-            choices: ["いくらですか", "どこですか", "何時ですか", "いくつありますか"],
-            explanation: "berapa は数量や値段を尋ね、harganya は「その値段」です。",
-            scenarioName: "買い物"
-        ),
-        Template(
-            transcript: "Di mana toilet?",
-            choices: ["トイレはどこですか", "トイレは使えますか", "トイレは何時までですか", "トイレは新しいですか"],
-            explanation: "di mana は場所を尋ねる表現です。",
-            scenarioName: "コンビニ"
-        ),
-        Template(
-            transcript: "Saya mau pesan nasi goreng.",
-            choices: ["ナシゴレンを注文したいです", "ナシゴレンを作りました", "ナシゴレンは辛いですか", "ナシゴレンが好きです"],
-            explanation: "mau は「〜したい」、pesan は「注文する」です。",
-            scenarioName: "ワルン"
-        ),
-        Template(
-            transcript: "Tolong antar saya ke bandara.",
-            choices: ["空港まで送ってください", "空港で待っていてください", "空港はどこですか", "空港まで歩きます"],
-            explanation: "tolong は依頼、antar は「送る」、ke bandara は「空港へ」です。",
-            scenarioName: "Grab"
-        ),
-        Template(
-            transcript: "Saya tidak mengerti.",
-            choices: ["わかりません", "知っています", "聞こえています", "話せます"],
-            explanation: "tidak は否定、mengerti は「理解する」です。",
-            scenarioName: "あいさつ"
-        ),
-        Template(
-            transcript: "Bisa bicara pelan-pelan?",
-            choices: ["ゆっくり話してもらえますか", "大きい声で話してください", "もう一度書いてください", "英語で話せますか"],
-            explanation: "pelan-pelan は「ゆっくり」。bisa は可能を尋ねます。",
-            scenarioName: "あいさつ"
-        ),
-        Template(
-            transcript: "Ini terlalu mahal.",
-            choices: ["これは高すぎます", "これは安いです", "これは新しいです", "これは重いです"],
-            explanation: "terlalu は「〜すぎる」、mahal は「高い」です。",
-            scenarioName: "買い物"
-        ),
-        Template(
-            transcript: "Boleh saya lihat?",
-            choices: ["見てもいいですか", "買ってもいいですか", "持って帰ってもいいですか", "使ってもいいですか"],
-            explanation: "boleh は許可を尋ね、lihat は「見る」です。",
-            scenarioName: "買い物"
-        ),
-        Template(
-            transcript: "Tolong bungkus untuk dibawa pulang.",
-            choices: ["持ち帰り用に包んでください", "ここで食べます", "袋はいりません", "温めてください"],
-            explanation: "bungkus は「包む」、dibawa pulang は「持ち帰る」です。",
-            scenarioName: "ワルン"
-        ),
-        Template(
-            transcript: "Saya alergi udang.",
-            choices: ["エビのアレルギーがあります", "エビが好きです", "エビを追加してください", "エビは高いです"],
-            explanation: "alergi はアレルギー、udang はエビです。",
-            scenarioName: "ワルン"
-        ),
-        Template(
-            transcript: "Jam berapa sekarang?",
-            choices: ["今何時ですか", "何時に始まりますか", "どのくらいかかりますか", "いつ行きますか"],
-            explanation: "jam berapa は時刻を尋ね、sekarang は「今」です。",
-            scenarioName: "あいさつ"
-        ),
-        Template(
-            transcript: "Kartu saya tidak bisa dipakai.",
-            choices: ["私のカードが使えません", "私のカードをなくしました", "カードで払います", "カードはありますか"],
-            explanation: "dipakai は「使われる」。tidak bisa で「〜できない」です。",
-            scenarioName: "コンビニ"
-        ),
-        Template(
-            transcript: "Tolong panggil taksi.",
-            choices: ["タクシーを呼んでください", "タクシーはどこですか", "タクシーで行きます", "タクシーは高いです"],
-            explanation: "panggil は「呼ぶ」です。",
-            scenarioName: "Grab"
-        ),
-        Template(
-            transcript: "Berapa lama perjalanannya?",
-            choices: ["移動はどのくらいかかりますか", "いくらかかりますか", "何時に着きますか", "どこへ行きますか"],
-            explanation: "berapa lama は所要時間、perjalanan は「移動・道のり」です。",
-            scenarioName: "Grab"
-        ),
-        Template(
-            transcript: "Saya menginap di hotel dekat sini.",
-            choices: ["この近くのホテルに泊まっています", "この近くのホテルを探しています", "ホテルは遠いです", "ホテルまで歩きます"],
-            explanation: "menginap は「宿泊する」、dekat sini は「この近く」です。",
-            scenarioName: "Grab"
-        ),
-        Template(
-            transcript: "Tolong tunggu sebentar.",
-            choices: ["少し待ってください", "急いでください", "また来てください", "先に行ってください"],
-            explanation: "tunggu は「待つ」、sebentar は「少しの間」です。",
-            scenarioName: "空港"
-        ),
-        Template(
-            transcript: "Ada yang bisa berbahasa Inggris?",
-            choices: ["英語が話せる人はいますか", "英語で書いてください", "英語のメニューはありますか", "英語を勉強しています"],
-            explanation: "ada yang bisa は「〜できる人がいる」、berbahasa Inggris は「英語を話す」です。",
-            scenarioName: "空港"
-        ),
-        Template(
-            transcript: "Saya mau bayar dengan kartu.",
-            choices: ["カードで払いたいです", "現金で払います", "領収書をください", "両替したいです"],
-            explanation: "bayar は「払う」、dengan kartu は「カードで」です。",
-            scenarioName: "コンビニ"
-        )
-    ]
-
-    static let questions: [LearningQuestion] = templates.enumerated().compactMap { index, template in
-        let questionNumber = index + 1
-        let questionID = QuestionID(rawValue: "demo-question-\(questionNumber)")
-
-        // 選択肢のIDは原稿の並び順に固定し、表示順だけを入れ替える。
-        // こうすると正解の位置を変えても、保存済み回答の参照が壊れない。
-        let authored = template.choices.enumerated().map { choiceIndex, text in
-            LearningChoice(
-                id: ChoiceID(rawValue: "demo-question-\(questionNumber)-choice-\(choiceIndex + 1)"),
-                text: text
-            )
-        }
-
-        guard let correctChoice = authored.first,
-              correctPositions.indices.contains(index) else {
-            return nil
-        }
-
-        let offset = correctPositions[index] % authored.count
-        let displayed = (0..<authored.count).map { position in
-            authored[(position - offset + authored.count) % authored.count]
-        }
-
-        return LearningQuestion(
-            id: questionID,
-            transcript: template.transcript,
-            choices: displayed,
-            correctChoiceID: correctChoice.id,
-            explanation: template.explanation,
-            scenarioName: template.scenarioName
-        )
+        demo(answeringCorrectly: LearningSessionPlanner.defaultQuestionCount)
     }
 }

@@ -98,7 +98,8 @@ final class LearningSessionModelTests: XCTestCase {
             store: FailingLearningSessionStore(),
             audioPlayer: audioPlayer,
             clock: clock,
-            identifierGenerator: FixedIdentifierGenerator()
+            identifierGenerator: FixedIdentifierGenerator(),
+            randomProvider: SeededRandomGeneratorProvider(seed: 7)
         )
 
         try answerCurrentQuestionCorrectly(in: model)
@@ -195,13 +196,79 @@ final class LearningSessionModelTests: XCTestCase {
         XCTAssertEqual(model.speechPulse, 0, "再生を始め直したら拍もリセットする")
     }
 
+    func testAudioDoesNotPlayAtMidpoint() async throws {
+        let model = makeModel()
+
+        for _ in 0..<LearningSessionState.checkpointQuestionCount {
+            try answerCurrentQuestionCorrectly(in: model)
+            model.advance()
+        }
+        XCTAssertEqual(model.state.phase, .midpoint)
+
+        let requestsBeforeMidpoint = audioPlayer.playedRequests.count
+
+        // 画面切り替えの途中で問題画面が再評価されても、次の問題の音声を鳴らさない。
+        model.playCurrentQuestion(rate: .standard)
+        await model.waitForAudioIdle()
+
+        XCTAssertEqual(
+            audioPlayer.playedRequests.count,
+            requestsBeforeMidpoint,
+            "中間結果では音声を再生しない"
+        )
+        XCTAssertEqual(model.audioState, .idle)
+    }
+
+    func testAudioDoesNotPlayOnFinalResult() async throws {
+        let model = makeModel()
+
+        for _ in 0..<LearningSessionPlanner.defaultQuestionCount {
+            try answerCurrentQuestionCorrectly(in: model)
+            model.advance()
+            if model.state.phase == .midpoint {
+                model.continueAfterMidpoint()
+            }
+        }
+        XCTAssertEqual(model.state.phase, .finalResult)
+
+        let requestsBeforeResult = audioPlayer.playedRequests.count
+
+        model.playCurrentQuestion(rate: .standard)
+        await model.waitForAudioIdle()
+
+        XCTAssertEqual(
+            audioPlayer.playedRequests.count,
+            requestsBeforeResult,
+            "総合結果では音声を再生しない"
+        )
+    }
+
+    func testAdvancingIntoMidpointStopsPlayingAudio() async throws {
+        audioPlayer.completesImmediately = false
+        let model = makeModel()
+
+        for _ in 0..<(LearningSessionState.checkpointQuestionCount - 1) {
+            try answerCurrentQuestionCorrectly(in: model)
+            model.advance()
+        }
+
+        model.playCurrentQuestion(rate: .standard)
+        await model.waitUntil { self.audioPlayer.playedRequests.isEmpty == false }
+        try answerCurrentQuestionCorrectly(in: model)
+        model.advance()
+
+        XCTAssertEqual(model.state.phase, .midpoint)
+        XCTAssertEqual(model.audioState, .idle, "区切りへ移るときに再生を止める")
+        XCTAssertGreaterThanOrEqual(audioPlayer.stopCount, 1)
+    }
+
     // MARK: - 3ラウンドの通し
 
     func testThreeConsecutiveSessionsLeaveNoResidualState() async throws {
         for round in 1...3 {
             let model = makeModel()
 
-            for index in 0..<DemoLearningContent.questions.count {
+            for index in 0..<LearningSessionPlanner.defaultQuestionCount {
                 model.playCurrentQuestion(rate: .standard)
                 await model.waitForAudioIdle()
                 try answerCurrentQuestionCorrectly(in: model)
@@ -214,7 +281,7 @@ final class LearningSessionModelTests: XCTestCase {
 
             await model.waitForPendingPersistence()
             XCTAssertEqual(model.state.phase, .finalResult, "round \(round): 20問で総合結果に到達する")
-            XCTAssertEqual(model.state.correctCount, 20, "round \(round)")
+            XCTAssertEqual(model.state.correctCount, LearningSessionPlanner.defaultQuestionCount, "round \(round)")
             XCTAssertEqual(model.audioState, .idle, "round \(round): 音声が鳴りっぱなしにならない")
 
             model.finish()
@@ -249,7 +316,8 @@ final class LearningSessionModelTests: XCTestCase {
             store: store,
             audioPlayer: audioPlayer,
             clock: clock,
-            identifierGenerator: FixedIdentifierGenerator()
+            identifierGenerator: FixedIdentifierGenerator(),
+            randomProvider: SeededRandomGeneratorProvider(seed: 7)
         )
     }
 
