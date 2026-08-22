@@ -16,6 +16,8 @@ final class AppModel {
     }
 
     private(set) var resumeState: ResumeState = .unavailable
+    /// 習得記録。生活図鑑の達成率と復習の優先度はこれを根拠にする。
+    private(set) var mastery: [QuestionID: QuestionMastery] = [:]
     /// 初回導入で受け取った学習者の前提。未設定なら初回導入から始める。
     private(set) var learnerProfile: LearnerProfile?
 
@@ -33,9 +35,14 @@ final class AppModel {
         audioPlayer
     }
 
-    let contentPack: LearningContentPack
+    private(set) var contentPack: LearningContentPack
+    /// 適用しなかった教材の不備。教材管理側へ差し戻す材料として画面に出す。
+    private(set) var contentIssues: [ContentIssue] = []
 
     private let store: any LearningSessionStoring
+    private let masteryStore: any MasteryStoring
+    private let masteryEvaluator: MasteryEvaluator
+    private let atlasEvaluator: LifeAtlasEvaluator
     private let audioPlayer: any QuestionAudioPlaying
     private let clock: any SessionClock
     private let identifierGenerator: any IdentifierGenerating
@@ -48,14 +55,29 @@ final class AppModel {
     init(
         contentPack: LearningContentPack = DemoLearningContent.pack,
         store: any LearningSessionStoring,
+        masteryStore: any MasteryStoring = DisabledMasteryStore(),
+        masteryEvaluator: MasteryEvaluator = MasteryEvaluator(),
+        atlasEvaluator: LifeAtlasEvaluator = LifeAtlasEvaluator(),
         audioPlayer: any QuestionAudioPlaying = SpeechQuestionAudioPlayer(),
         clock: any SessionClock = SystemSessionClock(),
         identifierGenerator: any IdentifierGenerating = SystemIdentifierGenerator(),
         randomProvider: any RandomGeneratorProviding = SystemRandomGeneratorProvider(),
         profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore()
     ) {
-        self.contentPack = contentPack
+        // 検証を通った版だけを有効にする。落ちた場合も学習を止めず、不備を画面に出す。
+        let activation = ContentPackActivator().activate(candidate: contentPack, current: nil)
+        switch activation {
+        case let .success(result):
+            self.contentPack = result.pack
+            contentIssues = result.rejectedIssues
+        case let .failure(.noUsablePack(issues)), let .failure(.rejected(issues)):
+            self.contentPack = contentPack
+            contentIssues = issues
+        }
         self.store = store
+        self.masteryStore = masteryStore
+        self.masteryEvaluator = masteryEvaluator
+        self.atlasEvaluator = atlasEvaluator
         self.audioPlayer = audioPlayer
         self.clock = clock
         self.identifierGenerator = identifierGenerator
@@ -72,18 +94,27 @@ final class AppModel {
 
     /// 既定の保存先を用意できない場合でも学習は継続できるようにする。
     static func live(profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore()) -> AppModel {
-        let store: any LearningSessionStoring
+        let stores = makeStores()
+        return AppModel(store: stores.session, masteryStore: stores.mastery, profileStore: profileStore)
+    }
+
+    /// 保存先を用意できない場合は、保存しない実装へまとめて落とす。片方だけ保存する状態を作らない。
+    private static func makeStores() -> (session: any LearningSessionStoring, mastery: any MasteryStoring) {
         do {
-            store = FileLearningSessionStore(fileURL: try FileLearningSessionStore.defaultFileURL())
+            return (
+                FileLearningSessionStore(fileURL: try FileLearningSessionStore.defaultFileURL()),
+                FileMasteryStore(fileURL: try FileMasteryStore.defaultFileURL())
+            )
         } catch {
-            store = DisabledLearningSessionStore()
+            return (DisabledLearningSessionStore(), DisabledMasteryStore())
         }
-        return AppModel(store: store, profileStore: profileStore)
     }
 
     /// 保存済みの学習データと初回導入の結果を消す。UIテストを決まった状態から始めるために使う。
     func resetStoredLearningData() async {
         try? await store.clear()
+        try? await masteryStore.clear()
+        mastery = [:]
         profileStore.clear()
         learnerProfile = profileStore.load()
         clearRestored()
@@ -92,6 +123,49 @@ final class AppModel {
     /// 保存済みセッションを読み、現行教材へ復帰できるかを判定する。
     ///
     /// 破損・教材版違い・問題構成違いは復帰させず、保存を破棄して新規開始できる状態に戻す。
+    /// 習得記録を読み直す。読めない場合は空として扱い、学習を止めない。
+    func refreshMastery() async {
+        mastery = ((try? await masteryStore.load()) ?? nil)?.byQuestionID ?? [:]
+    }
+
+    /// 生活図鑑の各カテゴリの進捗。解放判定の根拠つきで返す。
+    func scenarioProgressList(at date: Date? = nil) -> [ScenarioProgress] {
+        let evaluatedAt = date ?? clock.now()
+        return DemoLifeAtlas.scenarios.map { scenario in
+            atlasEvaluator.progress(
+                for: scenario,
+                pack: contentPack,
+                mastery: mastery,
+                at: evaluatedAt
+            )
+        }
+    }
+
+    /// 生活図鑑全体の達成率。
+    func atlasAchievement(at date: Date? = nil) -> Double {
+        let list = scenarioProgressList(at: date)
+        let totalActions = list.reduce(0) { $0 + $1.actionStatuses.count }
+        guard totalActions > 0 else { return 0 }
+        let unlocked = list.reduce(0) { $0 + $1.unlockedActionCount }
+        return Double(unlocked) / Double(totalActions)
+    }
+
+    /// 復習対象の問題数。ホームと学習入口に出す。
+    func reviewDueCount(at date: Date? = nil) -> Int {
+        let evaluatedAt = date ?? clock.now()
+        return contentPack.questions.count { question in
+            switch mastery[question.id]?.state(at: evaluatedAt) {
+            case .dueForReview, .relearning: true
+            default: false
+            }
+        }
+    }
+
+    var masteredQuestionCount: Int {
+        let now = clock.now()
+        return contentPack.questions.count { mastery[$0.id]?.isMastered(at: now) == true }
+    }
+
     func refreshResumeState() async {
         do {
             guard let snapshot = try await store.load() else {
@@ -118,10 +192,14 @@ final class AppModel {
         }
     }
 
-    func makeNewSessionModel() -> LearningSessionModel {
+    func makeNewSessionModel(origin: LearningSessionOrigin = .recommended) -> LearningSessionModel {
         LearningSessionModel.newSession(
             contentPack: contentPack,
+            origin: origin,
             store: store,
+            masteryStore: masteryStore,
+            masteryRecords: mastery,
+            masteryEvaluator: masteryEvaluator,
             audioPlayer: audioPlayer,
             clock: clock,
             identifierGenerator: identifierGenerator,
@@ -134,6 +212,9 @@ final class AppModel {
         LearningSessionModel(
             state: state,
             store: store,
+            masteryStore: masteryStore,
+            masteryRecords: mastery,
+            masteryEvaluator: masteryEvaluator,
             audioPlayer: audioPlayer,
             clock: clock,
             sessionID: identifierGenerator.newIdentifier(),
@@ -147,6 +228,9 @@ final class AppModel {
         return LearningSessionModel(
             state: restoredState,
             store: store,
+            masteryStore: masteryStore,
+            masteryRecords: mastery,
+            masteryEvaluator: masteryEvaluator,
             audioPlayer: audioPlayer,
             clock: clock,
             sessionID: restoredSessionID,

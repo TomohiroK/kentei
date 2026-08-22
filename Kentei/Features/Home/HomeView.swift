@@ -2,6 +2,8 @@ import SwiftUI
 
 struct HomeView: View {
     let resumeState: AppModel.ResumeState
+    let masteredQuestionCount: Int
+    let reviewDueCount: Int
     let onStartLearning: () -> Void
     let onResumeLearning: () -> Void
 
@@ -163,15 +165,15 @@ struct HomeView: View {
             LazyVGrid(columns: statColumns, spacing: 12) {
                 MetricChip(
                     systemImage: "checkmark.seal.fill",
-                    value: "\(resumeState.answeredCount ?? 0)",
-                    label: "home.answeredToday",
+                    value: "\(masteredQuestionCount)",
+                    label: "home.mastered",
                     tint: KenteiTheme.brandPrimary
                 )
                 MetricChip(
                     systemImage: "arrow.clockwise",
-                    value: "\(LearningSessionState.checkpointQuestionCount * 2)",
-                    label: "home.sessionLength",
-                    tint: KenteiTheme.brandAccent
+                    value: "\(reviewDueCount)",
+                    label: "home.reviewDue",
+                    tint: reviewDueCount > 0 ? .orange : KenteiTheme.brandAccent
                 )
             }
         }

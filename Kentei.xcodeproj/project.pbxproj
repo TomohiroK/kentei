@@ -37,6 +37,16 @@
 		A10000000000000000000228 /* OnboardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000127 /* OnboardingTests.swift */; };
 		A10000000000000000000229 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* XCTest.framework */; };
 		A10000000000000000000230 /* LearningFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000128 /* LearningFlowUITests.swift */; };
+		A10000000000000000000231 /* LifeAtlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000129 /* LifeAtlas.swift */; };
+		A10000000000000000000232 /* Mastery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000130 /* Mastery.swift */; };
+		A10000000000000000000233 /* MasteryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000131 /* MasteryStore.swift */; };
+		A10000000000000000000234 /* ScenarioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000132 /* ScenarioDetailView.swift */; };
+		A10000000000000000000235 /* MasteryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000133 /* MasteryTests.swift */; };
+		A10000000000000000000236 /* LifeAtlasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000134 /* LifeAtlasTests.swift */; };
+		A10000000000000000000237 /* SessionPlanningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000135 /* SessionPlanningTests.swift */; };
+		A10000000000000000000238 /* ContentCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000136 /* ContentCatalog.swift */; };
+		A10000000000000000000239 /* ContentCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000137 /* ContentCatalogTests.swift */; };
+		A10000000000000000000240 /* ContentPackProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000138 /* ContentPackProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +99,16 @@
 		A10000000000000000000127 /* OnboardingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000033 /* KenteiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KenteiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000128 /* LearningFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningFlowUITests.swift; sourceTree = "<group>"; };
+		A10000000000000000000129 /* LifeAtlas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/LifeAtlas.swift; sourceTree = "<group>"; };
+		A10000000000000000000130 /* Mastery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/Mastery.swift; sourceTree = "<group>"; };
+		A10000000000000000000131 /* MasteryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/MasteryStore.swift; sourceTree = "<group>"; };
+		A10000000000000000000132 /* ScenarioDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ScenarioAtlas/ScenarioDetailView.swift; sourceTree = "<group>"; };
+		A10000000000000000000133 /* MasteryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasteryTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000134 /* LifeAtlasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeAtlasTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000135 /* SessionPlanningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPlanningTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000136 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/ContentCatalog.swift; sourceTree = "<group>"; };
+		A10000000000000000000137 /* ContentCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalogTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000138 /* ContentPackProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/ContentPackProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +162,12 @@
 		A10000000000000000000004 /* Kentei */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000138 /* ContentPackProvider.swift */,
+				A10000000000000000000136 /* ContentCatalog.swift */,
+				A10000000000000000000132 /* ScenarioDetailView.swift */,
+				A10000000000000000000131 /* MasteryStore.swift */,
+				A10000000000000000000130 /* Mastery.swift */,
+				A10000000000000000000129 /* LifeAtlas.swift */,
 				A10000000000000000000126 /* OnboardingView.swift */,
 				A10000000000000000000125 /* LearnerProfile.swift */,
 				A10000000000000000000124 /* DemoLearningContent.swift */,
@@ -179,6 +205,10 @@
 		A10000000000000000000005 /* KenteiTests */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000137 /* ContentCatalogTests.swift */,
+				A10000000000000000000135 /* SessionPlanningTests.swift */,
+				A10000000000000000000134 /* LifeAtlasTests.swift */,
+				A10000000000000000000133 /* MasteryTests.swift */,
 				A10000000000000000000127 /* OnboardingTests.swift */,
 				A10000000000000000000123 /* LearningSessionModelTests.swift */,
 				A10000000000000000000122 /* LearningSessionPersistenceTests.swift */,
@@ -319,6 +349,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000240 /* ContentPackProvider.swift in Sources */,
+				A10000000000000000000238 /* ContentCatalog.swift in Sources */,
+				A10000000000000000000234 /* ScenarioDetailView.swift in Sources */,
+				A10000000000000000000233 /* MasteryStore.swift in Sources */,
+				A10000000000000000000232 /* Mastery.swift in Sources */,
+				A10000000000000000000231 /* LifeAtlas.swift in Sources */,
 				A10000000000000000000227 /* OnboardingView.swift in Sources */,
 				A10000000000000000000226 /* LearnerProfile.swift in Sources */,
 				A10000000000000000000225 /* DemoLearningContent.swift in Sources */,
@@ -346,6 +382,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000239 /* ContentCatalogTests.swift in Sources */,
+				A10000000000000000000237 /* SessionPlanningTests.swift in Sources */,
+				A10000000000000000000236 /* LifeAtlasTests.swift in Sources */,
+				A10000000000000000000235 /* MasteryTests.swift in Sources */,
 				A10000000000000000000228 /* OnboardingTests.swift in Sources */,
 				A10000000000000000000224 /* LearningSessionModelTests.swift in Sources */,
 				A10000000000000000000223 /* LearningSessionPersistenceTests.swift in Sources */,

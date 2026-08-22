@@ -25,6 +25,9 @@ final class LearningSessionModel: Identifiable {
     private(set) var speechPulse = 0
 
     private let store: any LearningSessionStoring
+    private let masteryStore: any MasteryStoring
+    private let masteryEvaluator: MasteryEvaluator
+    private var masteryRecords: [QuestionID: QuestionMastery]
     private let audioPlayer: any QuestionAudioPlaying
     private let clock: any SessionClock
     private let sessionID: UUID
@@ -36,6 +39,9 @@ final class LearningSessionModel: Identifiable {
     init(
         state: LearningSessionState,
         store: any LearningSessionStoring,
+        masteryStore: any MasteryStoring = DisabledMasteryStore(),
+        masteryRecords: [QuestionID: QuestionMastery] = [:],
+        masteryEvaluator: MasteryEvaluator = MasteryEvaluator(),
         audioPlayer: any QuestionAudioPlaying,
         clock: any SessionClock,
         sessionID: UUID,
@@ -43,6 +49,9 @@ final class LearningSessionModel: Identifiable {
     ) {
         self.state = state
         self.store = store
+        self.masteryStore = masteryStore
+        self.masteryRecords = masteryRecords
+        self.masteryEvaluator = masteryEvaluator
         self.audioPlayer = audioPlayer
         self.clock = clock
         self.sessionID = sessionID
@@ -56,14 +65,24 @@ final class LearningSessionModel: Identifiable {
     /// 出題順と選択肢順を毎回引き直して、新しいセッションを始める。
     static func newSession(
         contentPack: LearningContentPack,
+        origin: LearningSessionOrigin = .recommended,
         store: any LearningSessionStoring,
+        masteryStore: any MasteryStoring = DisabledMasteryStore(),
+        masteryRecords: [QuestionID: QuestionMastery] = [:],
+        masteryEvaluator: MasteryEvaluator = MasteryEvaluator(),
         audioPlayer: any QuestionAudioPlaying,
         clock: any SessionClock,
         identifierGenerator: any IdentifierGenerating,
         randomProvider: any RandomGeneratorProviding
     ) -> LearningSessionModel {
         var generator = randomProvider.makeGenerator()
-        let plan = LearningSessionPlanner.makePlan(from: contentPack, using: &generator)
+        let plan = LearningSessionPlanner.makePlan(
+            from: contentPack,
+            origin: origin,
+            mastery: masteryRecords,
+            at: clock.now(),
+            using: &generator
+        )
         // 計画は教材パックそのものから作るため食い違わない。万一に備え原稿順へ落とす。
         let state = (try? LearningSessionState(contentPack: contentPack, plan: plan))
             ?? LearningSessionState(contentPack: contentPack)
@@ -71,6 +90,9 @@ final class LearningSessionModel: Identifiable {
         return LearningSessionModel(
             state: state,
             store: store,
+            masteryStore: masteryStore,
+            masteryRecords: masteryRecords,
+            masteryEvaluator: masteryEvaluator,
             audioPlayer: audioPlayer,
             clock: clock,
             sessionID: identifierGenerator.newIdentifier(),
@@ -136,6 +158,14 @@ final class LearningSessionModel: Identifiable {
 
     func submit() {
         guard state.submit(at: clock.now()) else { return }
+
+        // 回答は習得記録にも即時反映する。生活図鑑の解放判定はこの記録だけを根拠にする。
+        if let answer = state.answers.last {
+            masteryRecords[answer.questionID] = masteryEvaluator.updated(
+                masteryRecords[answer.questionID],
+                with: answer
+            )
+        }
         persist()
     }
 
@@ -200,11 +230,16 @@ final class LearningSessionModel: Identifiable {
             startedAt: startedAt,
             updatedAt: clock.now()
         )
+        let records = MasteryRecords(
+            settingsVersion: masteryEvaluator.settings.version,
+            records: Array(masteryRecords.values).sorted { $0.questionID.rawValue < $1.questionID.rawValue }
+        )
         let previous = persistenceChain
-        persistenceChain = Task { [store] in
+        persistenceChain = Task { [store, masteryStore] in
             await previous?.value
             do {
                 try await store.save(snapshot)
+                try await masteryStore.save(records)
                 self.hasPersistenceFailure = false
             } catch {
                 self.hasPersistenceFailure = true

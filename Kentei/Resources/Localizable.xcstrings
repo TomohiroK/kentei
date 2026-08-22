@@ -1,6 +1,326 @@
 {
   "sourceLanguage": "ja",
   "strings": {
+    "action.airport.askHelp": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meminta bantuan saat tidak paham"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聞き取れないときに助けを求められる"
+          }
+        }
+      }
+    },
+    "action.airport.checkin": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyerahkan paspor dan dokumen di konter"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受付でパスポートや書類を渡せる"
+          }
+        }
+      }
+    },
+    "action.airport.greeting": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Percakapan dasar di bandara"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空港で基本のやりとりができる"
+          }
+        }
+      }
+    },
+    "action.airport.time": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami waktu dan instruksi menunggu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時刻と待機の案内が分かる"
+          }
+        }
+      }
+    },
+    "action.convenience.askInStore": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menanyakan hal yang diperlukan di toko"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "店内で必要なことを聞ける"
+          }
+        }
+      }
+    },
+    "action.convenience.payment": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyampaikan cara pembayaran"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支払い方法を伝えられる"
+          }
+        }
+      }
+    },
+    "action.convenience.price": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menanyakan harga"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "値段を聞ける"
+          }
+        }
+      }
+    },
+    "action.convenience.trouble": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyampaikan masalah pembayaran"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会計のトラブルを伝えられる"
+          }
+        }
+      }
+    },
+    "action.grab.destination": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyampaikan tujuan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行き先を伝えられる"
+          }
+        }
+      }
+    },
+    "action.grab.duration": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memastikan lama dan rute perjalanan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所要時間と経路を確認できる"
+          }
+        }
+      }
+    },
+    "action.grab.request": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meminta hal terkait perjalanan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "乗車まわりの依頼ができる"
+          }
+        }
+      }
+    },
+    "action.grab.stay": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyampaikan tempat menginap"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "滞在先を伝えられる"
+          }
+        }
+      }
+    },
+    "action.warung.adjust": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meminta penyesuaian rasa dan porsi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辛さや量を調整してもらえる"
+          }
+        }
+      }
+    },
+    "action.warung.order": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memesan makanan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "料理を注文できる"
+          }
+        }
+      }
+    },
+    "action.warung.smallTalk": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berbincang saat makan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "食事の場でやりとりできる"
+          }
+        }
+      }
+    },
+    "action.warung.takeaway": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyampaikan bungkus bawa pulang dan alergi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "持ち帰りやアレルギーを伝えられる"
+          }
+        }
+      }
+    },
+    "atlas.action.locked": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terkunci"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未解放"
+          }
+        }
+      }
+    },
+    "atlas.action.remaining": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sisa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あと"
+          }
+        }
+      }
+    },
+    "atlas.action.unlocked": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terbuka"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解放済み"
+          }
+        }
+      }
+    },
+    "atlas.actions": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yang bisa Anda lakukan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "できるようになること"
+          }
+        }
+      }
+    },
     "atlas.airport": {
       "localizations": {
         "id": {
@@ -61,6 +381,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "支払い・数量・商品の場所"
+          }
+        }
+      }
+    },
+    "atlas.dueForReview": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soal siap diulang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復習の時期になった問題"
           }
         }
       }
@@ -145,6 +481,38 @@
         }
       }
     },
+    "atlas.metric.actions": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aksi terbuka"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解放済みの行動"
+          }
+        }
+      }
+    },
+    "atlas.metric.mastered": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soal dikuasai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "習得済みの問題"
+          }
+        }
+      }
+    },
     "atlas.scenes": {
       "localizations": {
         "id": {
@@ -161,6 +529,22 @@
         }
       }
     },
+    "atlas.startScenario": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belajar situasi ini"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この場面で学習する"
+          }
+        }
+      }
+    },
     "atlas.title": {
       "localizations": {
         "id": {
@@ -173,6 +557,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "生活図鑑"
+          }
+        }
+      }
+    },
+    "atlas.unlockCondition": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syarat membuka"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解放条件"
+          }
+        }
+      }
+    },
+    "atlas.unlockConditionDetail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aksi terbuka setelah 80% soal terkait dikuasai. Satu jawaban benar belum cukup: perlu benar berturut-turut dan lulus pengulangan setelah beberapa waktu."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "関連する問題の8割を習得すると解放されます。習得は1回の正解では成立せず、続けて正解し、一定期間後の復習にも合格する必要があります。"
+          }
+        }
+      }
+    },
+    "atlas.unlockedActions": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aksi terbuka"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解放済みの行動"
           }
         }
       }
@@ -401,6 +833,22 @@
         }
       }
     },
+    "home.mastered": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soal dikuasai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "習得済みの問題"
+          }
+        }
+      }
+    },
     "home.notifications": {
       "localizations": {
         "id": {
@@ -529,6 +977,22 @@
         }
       }
     },
+    "home.reviewDue": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siap diulang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復習の時期"
+          }
+        }
+      }
+    },
     "home.sessionLength": {
       "localizations": {
         "id": {
@@ -653,6 +1117,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "空港の続きから"
+          }
+        }
+      }
+    },
+    "learn.level": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tingkat"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "級"
           }
         }
       }
@@ -1489,6 +1969,22 @@
         }
       }
     },
+    "progress.mastered": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soal yang dikuasai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "習得済みの問題"
+          }
+        }
+      }
+    },
     "progress.recent": {
       "localizations": {
         "id": {
@@ -1533,6 +2029,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "空港シナリオの実戦チェックに合格"
+          }
+        }
+      }
+    },
+    "progress.reviewDue": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waktunya mengulang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復習の時期"
+          }
+        }
+      }
+    },
+    "progress.reviewDue.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soal yang sudah dikuasai akan muncul kembali setelah beberapa waktu. Jawaban benar saat pengulangan mempertahankan status kuasai."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "習得した問題は一定期間後に復習対象になります。復習で正解すると習得状態を保てます。"
           }
         }
       }
@@ -2157,6 +2685,118 @@
           "stringUnit": {
             "state": "translated",
             "value": "音声を自動再生"
+          }
+        }
+      }
+    },
+    "settings.content": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教材"
+          }
+        }
+      }
+    },
+    "settings.content.checksum": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checksum"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "チェックサム"
+          }
+        }
+      }
+    },
+    "settings.content.invalid": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perlu diperiksa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要確認"
+          }
+        }
+      }
+    },
+    "settings.content.questions": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soal siap tayang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出題できる問題数"
+          }
+        }
+      }
+    },
+    "settings.content.valid": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada masalah"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "問題なし"
+          }
+        }
+      }
+    },
+    "settings.content.validation": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pemeriksaan otomatis"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動検査"
+          }
+        }
+      }
+    },
+    "settings.content.version": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versi materi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教材の版"
           }
         }
       }

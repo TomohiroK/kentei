@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct LearnView: View {
-    let onStartLearning: () -> Void
+    let reviewDueCount: Int
+    let onStartLearning: (LearningSessionOrigin) -> Void
+
+    @State private var selectedLevel: CertificationLevel = .e
 
     var body: some View {
         NavigationStack {
@@ -16,21 +19,29 @@ struct LearnView: View {
                         detail: "learn.recommended.detail",
                         icon: "sparkles",
                         tint: KenteiTheme.brandAccent,
-                        action: onStartLearning
+                        badge: nil,
+                        identifier: "learn.recommended",
+                        action: { onStartLearning(.recommended) }
                     )
+                    levelPicker
+
                     learningMode(
                         title: "learn.byLevel",
                         detail: "learn.byLevel.detail",
                         icon: "medal.fill",
                         tint: KenteiTheme.brandPrimary,
-                        action: onStartLearning
+                        badge: selectedLevel.displayText,
+                        identifier: "learn.byLevel",
+                        action: { onStartLearning(.level(selectedLevel)) }
                     )
                     learningMode(
                         title: "learn.review",
                         detail: "learn.review.detail",
                         icon: "arrow.clockwise",
                         tint: .orange,
-                        action: onStartLearning
+                        badge: reviewDueCount > 0 ? "\(reviewDueCount)" : nil,
+                        identifier: "learn.review",
+                        action: { onStartLearning(.review) }
                     )
                 }
                 .padding(.horizontal, KenteiTheme.horizontalPadding)
@@ -39,6 +50,17 @@ struct LearnView: View {
             .background(KenteiTheme.skyBackground.ignoresSafeArea())
             .navigationTitle("learn.title")
         }
+    }
+
+    /// 級別入口で出す級。提供している級だけを並べる。
+    private var levelPicker: some View {
+        Picker("learn.level", selection: $selectedLevel) {
+            ForEach(CertificationLevel.availableLevels, id: \.rawValue) { level in
+                Text(level.displayText).tag(level)
+            }
+        }
+        .pickerStyle(.segmented)
+        .accessibilityIdentifier("learn.levelPicker")
     }
 
     private var recommendedCard: some View {
@@ -56,6 +78,7 @@ struct LearnView: View {
                     Text("learn.hero.detail")
                         .font(.caption)
                         .foregroundStyle(KenteiTheme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -66,6 +89,8 @@ struct LearnView: View {
         detail: LocalizedStringKey,
         icon: String,
         tint: Color,
+        badge: String?,
+        identifier: String,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -85,9 +110,19 @@ struct LearnView: View {
                             .font(.subheadline)
                             .foregroundStyle(KenteiTheme.textSecondary)
                             .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    Spacer()
+                    Spacer(minLength: 4)
+
+                    if let badge {
+                        Text(badge)
+                            .font(.subheadline.bold().monospacedDigit())
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(tint, in: Capsule())
+                    }
 
                     Image(systemName: "chevron.right")
                         .foregroundStyle(KenteiTheme.textSecondary)
@@ -95,10 +130,21 @@ struct LearnView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
     }
 }
 
 struct LearningProgressView: View {
+    let masteredQuestionCount: Int
+    let totalQuestionCount: Int
+    let reviewDueCount: Int
+    let scenarioProgressList: [ScenarioProgress]
+
+    private var masteryRatio: Double {
+        guard totalQuestionCount > 0 else { return 0 }
+        return Double(masteredQuestionCount) / Double(totalQuestionCount)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -107,20 +153,25 @@ struct LearningProgressView: View {
 
                     SectionTitle(title: "progress.skills")
 
-                    skillRow(title: "progress.listening", icon: "ear.fill", value: 0.68, tint: KenteiTheme.brandPrimary)
-                    skillRow(title: "progress.vocabulary", icon: "text.book.closed.fill", value: 0.54, tint: KenteiTheme.brandAccent)
-                    skillRow(title: "progress.dailyLife", icon: "figure.walk", value: 0.41, tint: .orange)
+                    ForEach(scenarioProgressList) { progress in
+                        scenarioRow(progress)
+                    }
 
                     SectionTitle(title: "progress.recent")
 
                     KenteiCard {
-                        Label("progress.recent.airport", systemImage: "checkmark.seal.fill")
-                            .font(.headline)
-                            .foregroundStyle(KenteiTheme.textPrimary)
-                        Text("progress.recent.airport.detail")
-                            .font(.subheadline)
-                            .foregroundStyle(KenteiTheme.textSecondary)
-                            .padding(.top, 4)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("progress.reviewDue", systemImage: "arrow.clockwise")
+                                .font(.headline)
+                                .foregroundStyle(KenteiTheme.textPrimary)
+                            Text("\(reviewDueCount)")
+                                .font(.title2.bold().monospacedDigit())
+                                .foregroundStyle(reviewDueCount > 0 ? .orange : KenteiTheme.textSecondary)
+                            Text("progress.reviewDue.detail")
+                                .font(.subheadline)
+                                .foregroundStyle(KenteiTheme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
                 .padding(.horizontal, KenteiTheme.horizontalPadding)
@@ -134,7 +185,7 @@ struct LearningProgressView: View {
     private var levelCard: some View {
         KenteiCard {
             HStack(spacing: 18) {
-                ProgressRing(progress: 0.64, label: "E級", size: 92)
+                ProgressRing(progress: masteryRatio, label: "E級", size: 92)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("progress.currentLevel")
@@ -143,47 +194,49 @@ struct LearningProgressView: View {
                     Text("progress.level.title")
                         .font(.title2.bold())
                         .foregroundStyle(KenteiTheme.textPrimary)
-                    Text("progress.level.detail")
-                        .font(.subheadline)
+                    Text("progress.mastered")
+                        .font(.caption)
                         .foregroundStyle(KenteiTheme.textSecondary)
+                    Text("\(masteredQuestionCount) / \(totalQuestionCount)")
+                        .font(.headline.monospacedDigit())
+                        .foregroundStyle(KenteiTheme.textPrimary)
                 }
             }
         }
     }
 
-    private func skillRow(
-        title: LocalizedStringKey,
-        icon: String,
-        value: Double,
-        tint: Color
-    ) -> some View {
+    private func scenarioRow(_ progress: ScenarioProgress) -> some View {
         KenteiCard {
             HStack(spacing: 14) {
-                Image(systemName: icon)
+                Image(systemName: progress.scenario.systemImage)
                     .font(.headline)
-                    .foregroundStyle(tint)
+                    .foregroundStyle(KenteiTheme.brandPrimary)
                     .frame(width: 42, height: 42)
-                    .background(tint.opacity(0.12), in: Circle())
+                    .background(KenteiTheme.brandPrimarySoft, in: Circle())
 
                 VStack(alignment: .leading, spacing: 7) {
                     HStack {
-                        Text(title)
+                        Text(LocalizedStringKey(progress.scenario.titleKey))
                             .font(.headline)
                             .foregroundStyle(KenteiTheme.textPrimary)
                         Spacer()
-                        Text("\(Int((value * 100).rounded()))%")
+                        Text("\(Int((progress.achievement * 100).rounded()))%")
                             .font(.subheadline.bold().monospacedDigit())
-                            .foregroundStyle(tint)
+                            .foregroundStyle(KenteiTheme.brandPrimary)
                     }
-                    ProgressView(value: value)
-                        .tint(tint)
+                    ProgressView(value: progress.achievement)
+                        .tint(KenteiTheme.brandPrimary)
                 }
             }
+            .accessibilityElement(children: .combine)
         }
     }
 }
 
 struct SettingsView: View {
+    let contentPack: LearningContentPack
+    let contentIssueCount: Int
+
     @AppStorage(LearningPreferenceKey.playbackRate) private var playbackRate = PlaybackRate.standard.rawValue
     @AppStorage(LearningPreferenceKey.autoplay) private var autoplay = true
     @AppStorage(LearningPreferenceKey.haptics) private var haptics = true
@@ -209,6 +262,36 @@ struct SettingsView: View {
                         Spacer()
                         Text("settings.language.japanese")
                             .foregroundStyle(KenteiTheme.textSecondary)
+                    }
+                }
+
+                Section("settings.content") {
+                    LabeledContent("settings.content.version") {
+                        Text(verbatim: contentPack.version)
+                            .font(.footnote.monospaced())
+                    }
+                    LabeledContent("settings.content.checksum") {
+                        // 全文は長いため先頭のみ出す。破損検知は自動検査で行う。
+                        Text(verbatim: String(contentPack.checksum.prefix(12)))
+                            .font(.footnote.monospaced())
+                    }
+                    LabeledContent("settings.content.questions") {
+                        Text("\(contentPack.deliverableQuestions.count)")
+                            .monospacedDigit()
+                    }
+                    ForEach(CertificationLevel.availableLevels, id: \.rawValue) { level in
+                        LabeledContent(level.displayText) {
+                            Text("\(contentPack.deliverableQuestions(at: level).count)")
+                                .monospacedDigit()
+                        }
+                    }
+                    LabeledContent("settings.content.validation") {
+                        Label(
+                            contentIssueCount == 0 ? "settings.content.valid" : "settings.content.invalid",
+                            systemImage: contentIssueCount == 0 ? "checkmark.seal.fill" : "exclamationmark.triangle.fill"
+                        )
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(contentIssueCount == 0 ? KenteiTheme.success : KenteiTheme.error)
                     }
                 }
 

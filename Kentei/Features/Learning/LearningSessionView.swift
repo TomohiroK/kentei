@@ -77,7 +77,7 @@ private struct QuestionScreen: View {
                         AudioPlaybackBar(
                             model: model,
                             questionID: question.id,
-                            scenarioName: question.scenarioName
+                            scenarioTitleKey: question.scenarioTitleKey
                         )
                         .id(question.id)
 
@@ -271,7 +271,7 @@ private struct QuestionScreen: View {
 private struct AudioPlaybackBar: View {
     let model: LearningSessionModel
     let questionID: QuestionID
-    let scenarioName: String
+    let scenarioTitleKey: LocalizedStringKey?
 
     @AppStorage(LearningPreferenceKey.playbackRate) private var storedRate = PlaybackRate.standard.rawValue
     @AppStorage(LearningPreferenceKey.autoplay) private var isAutoplayEnabled = true
@@ -303,10 +303,12 @@ private struct AudioPlaybackBar: View {
             }
 
             HStack(spacing: 8) {
-                Label(scenarioName, systemImage: "location.fill")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(KenteiTheme.brandPrimary)
-                    .accessibilityElement(children: .combine)
+                if let scenarioTitleKey {
+                    Label(scenarioTitleKey, systemImage: "location.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(KenteiTheme.brandPrimary)
+                        .accessibilityElement(children: .combine)
+                }
 
                 Spacer(minLength: 8)
 

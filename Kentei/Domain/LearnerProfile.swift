@@ -25,21 +25,6 @@ struct LearnerProfile: Codable, Equatable, Sendable {
         case work
     }
 
-    /// MVPで扱う級。B級以上はAI評価が必要なため初回導入では選ばせない。
-    enum TargetLevel: String, Codable, CaseIterable, Sendable {
-        case e
-        case d
-        case c
-
-        var displayText: String {
-            switch self {
-            case .e: "E級"
-            case .d: "D級"
-            case .c: "C級"
-            }
-        }
-    }
-
     enum Experience: String, Codable, CaseIterable, Sendable {
         case none
         case beginner
@@ -48,12 +33,12 @@ struct LearnerProfile: Codable, Equatable, Sendable {
 
     var interfaceLanguage: InterfaceLanguage
     var purpose: Purpose
-    var targetLevel: TargetLevel
+    var targetLevel: CertificationLevel
     var experience: Experience
     var completedOnboardingAt: Date
 
-    /// MVPの教材はE級のみ。目標級が上でも、最初のセッションはE級から始める。
-    var startingLevel: TargetLevel {
+    /// 学習はE級から始める。目標級が上でも、最初のセッションはE級を出す。
+    var startingLevel: CertificationLevel {
         .e
     }
 }

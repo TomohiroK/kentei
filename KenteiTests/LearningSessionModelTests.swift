@@ -111,20 +111,35 @@ final class LearningSessionModelTests: XCTestCase {
     // MARK: - 音声
 
     func testPlayingAudioCountsPlaybackAndUsesSelectedRate() async throws {
-        let model = makeModel()
+        let model = try makeModel(questionNumbers: [1])
 
         model.playCurrentQuestion(rate: .slow)
         await model.waitForAudioIdle()
 
-        XCTAssertEqual(model.state.audioPlayCount, 1)
+        XCTAssertEqual(model.state.audioPlayCount, 1, "1回の再生は1回だけ数える")
         XCTAssertEqual(audioPlayer.playedRequests.count, 1)
         XCTAssertEqual(audioPlayer.playedRequests[0].rate, .slow)
-        XCTAssertEqual(audioPlayer.playedRequests[0].text, model.state.currentQuestion?.transcript)
+        XCTAssertEqual(audioPlayer.playedRequests[0].text, "Selamat pagi.")
+    }
+
+    func testConversationQuestionPlaysEachSpeakerInOrder() async throws {
+        // 31番は2話者の会話問題。
+        let model = try makeModel(questionNumbers: [31])
+        let question = try XCTUnwrap(model.state.currentQuestion)
+        XCTAssertTrue(question.isConversation)
+
+        model.playCurrentQuestion(rate: .standard)
+        await model.waitForAudioIdle()
+
+        XCTAssertEqual(audioPlayer.playedRequests.count, question.utterances.count)
+        XCTAssertEqual(audioPlayer.playedRequests.map(\.text), question.utterances.map(\.text))
+        XCTAssertEqual(audioPlayer.playedRequests.map(\.speakerIndex), [0, 1], "話者を分けて順に鳴らす")
+        XCTAssertEqual(model.state.audioPlayCount, 1, "会話でも再生回数は1回")
     }
 
     func testReplayingStopsPreviousPlaybackInsteadOfOverlapping() async throws {
         audioPlayer.completesImmediately = false
-        let model = makeModel()
+        let model = try makeModel(questionNumbers: [1])
 
         model.playCurrentQuestion(rate: .standard)
         await model.waitUntil { self.audioPlayer.playedRequests.count == 1 }
@@ -309,6 +324,23 @@ final class LearningSessionModelTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    /// 出題を固定したモデル。音声の数え方など、特定の問題に依存する検証で使う。
+    private func makeModel(questionNumbers: [Int]) throws -> LearningSessionModel {
+        let pack = DemoLearningContent.pack
+        let state = try LearningSessionState(
+            contentPack: pack,
+            plan: TestSession.makePlan(questionNumbers: questionNumbers, pack: pack)
+        )
+        return LearningSessionModel(
+            state: state,
+            store: store,
+            audioPlayer: audioPlayer,
+            clock: clock,
+            sessionID: FixedIdentifierGenerator().newIdentifier(),
+            startedAt: clock.now()
+        )
+    }
 
     private func makeModel() -> LearningSessionModel {
         LearningSessionModel.newSession(

@@ -23,7 +23,7 @@ struct OnboardingView: View {
     @State private var step: Step
     @State private var interfaceLanguage: InterfaceLanguage = .systemDefault
     @State private var purpose: LearnerProfile.Purpose?
-    @State private var targetLevel: LearnerProfile.TargetLevel = .e
+    @State private var targetLevel: CertificationLevel = .e
     @State private var experience: LearnerProfile.Experience?
     @State private var audioCheck: AudioCheck = .notPlayed
     @State private var isPlayingSample = false
@@ -142,7 +142,8 @@ struct OnboardingView: View {
             stepBody("onboarding.level.body")
 
             Picker("onboarding.level.title", selection: $targetLevel) {
-                ForEach(LearnerProfile.TargetLevel.allCases, id: \.rawValue) { level in
+                // 未提供の級はUIへ露出しない。
+                ForEach(CertificationLevel.availableLevels, id: \.rawValue) { level in
                     Text(level.displayText).tag(level)
                 }
             }

@@ -57,8 +57,10 @@ Kentei/
 ├── App/            KenteiApp, RootView, AppModel
 ├── Core/           SystemDependencies（時計・識別子・乱数）, LearningPreferences
 ├── Domain/         LearningSessionState, LearningSessionSnapshot, QuestionAudio,
-│                   LearnerProfile, DemoLearningContent
-├── Data/           LearningSessionStore, SpeechQuestionAudioPlayer
+│                   LearnerProfile, DemoLearningContent, LifeAtlas, Mastery,
+│                   ContentCatalog（級・形式・公開状態・検証）
+├── Data/           LearningSessionStore, MasteryStore, ContentPackProvider,
+│                   SpeechQuestionAudioPlayer
 ├── DesignSystem/   KenteiTheme, KenteiComponents
 ├── Features/       Onboarding, Home, Learning, ScenarioAtlas, Supporting
 └── Resources/      Assets.xcassets, Localizable.xcstrings
@@ -369,3 +371,79 @@ UIテストを決まった状態から始めるため、アプリは次の起動
 - 音声の聞こえ確認は学習と同じ再生実装を使い、聞こえなかった場合の対処を案内する。
   聞こえなくても学習へ進める。導入で行き止まりを作らない。
 - 画面確認用に `-onboardingStep <番号>` で途中の手順から起動できる。
+
+## 14. 習得状態と行動解放
+
+### 習得状態
+
+回答を確定するたびに `MasteryEvaluator` が習得記録を更新し、`MasteryStore` へ保存する。
+セッションの保存とは別ファイル（`mastery.json`、`schemaVersion = 1`）に持つ。
+
+- 状態は `unseen → learning → provisional → mastered`、誤答で `relearning`、
+  復習期限を過ぎた習得済みは読み出し時に `dueForReview` として扱う。
+- **1回の正解では習得済みにしない。** 連続正解と習得点の両方を満たして初めて `mastered` にする。
+- 習得点の係数（正解、聞き直し、誤答、同一誤りの反復）は `MasteryScoringSettings` に持ち、
+  コード定数として散らさない。判定結果には使用した設定版を記録する。
+
+### 行動解放
+
+`LifeAtlasEvaluator` が、行動ごとに「必要な問題のうち習得済みの割合」で解放を判定する。
+
+- 閾値は `UnlockPolicy` に持ち、教材検証で調整できるようにする。
+- 判定結果（`ActionUnlockStatus`）は、必要問題数・習得済み数・残り件数・使用した
+  解放設定版・生活図鑑の版を伴う。画面にも設定版を示し、解放根拠を後から再現できるようにする。
+- カテゴリの達成率は「解放済み行動 ÷ 全行動」とする。
+
+### 出題の選び方
+
+`LearningSessionPlanner` が入口ごとに候補を絞り、優先度で並べる。
+
+| 入口 | 候補 |
+| --- | --- |
+| おすすめ / 級別 | 教材プール全体 |
+| 復習 | 復習期限・再学習・学習中の問題 |
+| 生活図鑑 | そのカテゴリの問題 |
+
+優先度は復習期限、弱点度、未出題補正、シナリオ必要度から算出する。係数は
+`SelectionWeights` に持ち、コードへ埋め込まない。候補が1セッション分に満たない場合も、
+同じ教材プールから補って20問を組む。これにより級別入口と生活図鑑入口で同じ教材を使う。
+
+## 15. 教材の版管理と公開
+
+### 問題が持つ属性
+
+問題は級（`CertificationLevel`）、形式（`QuestionType`）、公開状態（`ContentStatus`）を持つ。
+
+- MVPで提供するのは **E級とD級** のみ。C級以上は型として保持するがUIへ露出しない。
+- 採点できる形式（音声意味選択・応答選択・内容一致・行動判断）だけを出題する。
+- 公開状態は `draft → content_review → language_review → audio_review → test_delivery →
+  approved → published`。**新規セッションで出題するのは `published` だけ**とする。
+  `deprecated` は新規出題から外すが、過去の回答からは参照できる状態を保つ。
+- 誤答は理由（`DistractorReason`）を必ず持つ。理由の無い誤答は公開前に拒否する。
+
+### 自動検査
+
+`ContentPackValidator` が公開前に次を拒否する。
+
+| 検査 | 拒否する状態 |
+| --- | --- |
+| 正解 | 正解が無い、正解が選択肢に含まれない |
+| 選択肢 | 2件未満、IDの重複、文言の重複 |
+| 音声原稿 | 発話が無い、空文字 |
+| 解説・タグ | 解説が空、シナリオが未設定 |
+| 誤答 | 理由が無い |
+| 列挙値 | 未提供の級、採点できない形式 |
+| チェックサム | 教材の内容から計算した値と申告値が一致しない |
+
+チェックサムは問題の内容（ID・級・形式・状態・発話・選択肢・正解・解説・タグ）から
+SHA-256で算出する。内容が1文字でも変われば値が変わる。
+
+### 版の切り替え
+
+`ContentPackProviding` が教材パックの取得口で、同梱実装が `BundledContentPackProvider` である。
+配信方式（API・ダウンロード）は決定ゲートのため、プロトコル境界だけを定義し、
+特定サービスのSDKを持ち込まない。
+
+`ContentPackActivator` は自動検査を通った版だけを有効にする。検査に落ちた版は適用せず、
+**現在の有効版を保持する**。公開済みの版は上書きせず、新しい版として切り替える。
+拒否した不備は設定画面に出し、教材側へ差し戻す材料にする。

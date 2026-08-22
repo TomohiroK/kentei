@@ -42,6 +42,16 @@ extension ChoiceID: Codable {
 struct LearningChoice: Identifiable, Equatable, Sendable {
     let id: ChoiceID
     let text: String
+    let isCorrect: Bool
+    /// 誤答を作った理由。正答には持たせない。無作為な誤答を公開しないための記録。
+    let distractorReason: DistractorReason?
+
+    init(id: ChoiceID, text: String, isCorrect: Bool = false, distractorReason: DistractorReason? = nil) {
+        self.id = id
+        self.text = text
+        self.isCorrect = isCorrect
+        self.distractorReason = distractorReason
+    }
 }
 
 /// 出題音声の1発話。会話問題では話者を分けて複数持つ。
@@ -52,12 +62,16 @@ struct ScriptedUtterance: Equatable, Sendable {
 
 struct LearningQuestion: Identifiable, Equatable, Sendable {
     let id: QuestionID
+    let level: CertificationLevel
+    let questionType: QuestionType
+    let status: ContentStatus
     let utterances: [ScriptedUtterance]
     /// 原稿順の選択肢。学習者に見える順序はセッションごとに決まる。
     let choices: [LearningChoice]
     let correctChoiceID: ChoiceID
     let explanation: String
-    let scenarioName: String
+    /// この問題が属する生活図鑑のカテゴリ。級別入口と生活図鑑入口で同じ教材を使うための紐付け。
+    let scenarioIDs: [ScenarioID]
 
     /// 回答後に表示する本文。会話問題は話者ごとに行を分ける。
     var transcript: String {
@@ -66,6 +80,10 @@ struct LearningQuestion: Identifiable, Equatable, Sendable {
 
     var isConversation: Bool {
         utterances.count > 1
+    }
+
+    var primaryScenarioID: ScenarioID? {
+        scenarioIDs.first
     }
 
     func reordering(choiceIDs: [ChoiceID]) -> LearningQuestion? {
@@ -80,22 +98,53 @@ struct LearningQuestion: Identifiable, Equatable, Sendable {
 
         return LearningQuestion(
             id: id,
+            level: level,
+            questionType: questionType,
+            status: status,
             utterances: utterances,
             choices: reordered,
             correctChoiceID: correctChoiceID,
             explanation: explanation,
-            scenarioName: scenarioName
+            scenarioIDs: scenarioIDs
         )
     }
 }
 
 /// バージョン付きの教材パック。版が変わった保存データは復帰対象にしない。
+///
+/// 公開済み教材は上書きせず、新しい版を作る。チェックサムは内容から決まり、
+/// 読み込み時の破損検知に使う。
 struct LearningContentPack: Equatable, Sendable {
     let version: String
+    let checksum: String
     let questions: [LearningQuestion]
+
+    init(version: String, questions: [LearningQuestion]) {
+        self.init(version: version, questions: questions, checksum: LearningContentPack.checksum(of: questions))
+    }
+
+    /// チェックサムを外から与える入口。配信されたパックの申告値を検証するために使う。
+    init(version: String, questions: [LearningQuestion], checksum: String) {
+        self.version = version
+        self.questions = questions
+        self.checksum = checksum
+    }
 
     func question(with id: QuestionID) -> LearningQuestion? {
         questions.first { $0.id == id }
+    }
+
+    /// 新規セッションで出題してよい問題。公開済み・提供級・採点できる形式に限る。
+    var deliverableQuestions: [LearningQuestion] {
+        questions.filter { question in
+            question.status.isDeliverable
+                && question.level.isAvailableInMVP
+                && question.questionType.isDeliverableInMVP
+        }
+    }
+
+    func deliverableQuestions(at level: CertificationLevel) -> [LearningQuestion] {
+        deliverableQuestions.filter { $0.level == level }
     }
 }
 
@@ -114,16 +163,58 @@ struct LearningSessionPlan: Equatable, Sendable, Codable {
     }
 }
 
-/// 教材プールから、毎回異なる出題順と選択肢順のセッションを組み立てる。
+/// 学習の入口。同じ教材プールを、入口ごとの選び方で出題する。
+enum LearningSessionOrigin: Equatable, Sendable {
+    case recommended
+    case level(CertificationLevel)
+    case review
+    case scenario(ScenarioID)
+}
+
+/// 出題優先度の係数。運用設定として持ち、コードへ埋め込まない。
+struct SelectionWeights: Codable, Equatable, Sendable {
+    static let current = SelectionWeights(
+        version: "selection-2026-08-v1",
+        dueForReview: 100,
+        weakness: 60,
+        unseen: 40,
+        scenarioNeed: 30,
+        mastered: -80,
+        jitter: 20
+    )
+
+    let version: String
+    let dueForReview: Double
+    let weakness: Double
+    let unseen: Double
+    let scenarioNeed: Double
+    let mastered: Double
+    /// 同点の問題が毎回同じ順で出ないようにする幅。
+    let jitter: Double
+}
+
+/// 教材プールから、入口に応じた出題順と選択肢順のセッションを組み立てる。
 enum LearningSessionPlanner {
     static let defaultQuestionCount = 20
 
     static func makePlan(
         from pack: LearningContentPack,
+        origin: LearningSessionOrigin = .recommended,
+        mastery: [QuestionID: QuestionMastery] = [:],
+        at date: Date = Date(),
+        weights: SelectionWeights = .current,
         questionCount: Int = defaultQuestionCount,
         using generator: inout some RandomNumberGenerator
     ) -> LearningSessionPlan {
-        let selected = pack.questions.shuffled(using: &generator).prefix(questionCount)
+        let selected = selectQuestions(
+            from: pack,
+            origin: origin,
+            mastery: mastery,
+            at: date,
+            weights: weights,
+            questionCount: questionCount,
+            using: &generator
+        )
 
         let entries = selected.map { question in
             LearningSessionPlan.Entry(
@@ -132,7 +223,115 @@ enum LearningSessionPlanner {
             )
         }
 
-        return LearningSessionPlan(entries: Array(entries))
+        return LearningSessionPlan(entries: entries)
+    }
+
+    private static func selectQuestions(
+        from pack: LearningContentPack,
+        origin: LearningSessionOrigin,
+        mastery: [QuestionID: QuestionMastery],
+        at date: Date,
+        weights: SelectionWeights,
+        questionCount: Int,
+        using generator: inout some RandomNumberGenerator
+    ) -> [LearningQuestion] {
+        let preferred = candidates(in: pack, origin: origin, mastery: mastery, at: date)
+        let ranked = rank(preferred, mastery: mastery, origin: origin, at: date, weights: weights, using: &generator)
+
+        guard ranked.count < questionCount else {
+            return Array(ranked.prefix(questionCount))
+        }
+
+        // 入口ごとの候補が足りない場合も、同じ教材プールから補って20問を組む。
+        let selectedIDs = Set(ranked.map(\.id))
+        let remaining = pack.deliverableQuestions.filter { selectedIDs.contains($0.id) == false }
+        let fill = rank(remaining, mastery: mastery, origin: origin, at: date, weights: weights, using: &generator)
+        return Array((ranked + fill).prefix(questionCount))
+    }
+
+    private static func candidates(
+        in pack: LearningContentPack,
+        origin: LearningSessionOrigin,
+        mastery: [QuestionID: QuestionMastery],
+        at date: Date
+    ) -> [LearningQuestion] {
+        switch origin {
+        case .recommended:
+            pack.deliverableQuestions
+        case let .level(level):
+            pack.deliverableQuestions(at: level)
+        case .review:
+            pack.deliverableQuestions.filter { question in
+                switch mastery[question.id]?.state(at: date) {
+                case .dueForReview, .relearning, .learning: true
+                default: false
+                }
+            }
+        case let .scenario(scenarioID):
+            pack.deliverableQuestions.filter { $0.scenarioIDs.contains(scenarioID) }
+        }
+    }
+
+    private static func rank(
+        _ questions: [LearningQuestion],
+        mastery: [QuestionID: QuestionMastery],
+        origin: LearningSessionOrigin,
+        at date: Date,
+        weights: SelectionWeights,
+        using generator: inout some RandomNumberGenerator
+    ) -> [LearningQuestion] {
+        questions
+            .map { question in
+                (
+                    question,
+                    priority(
+                        for: question,
+                        mastery: mastery[question.id],
+                        origin: origin,
+                        at: date,
+                        weights: weights
+                    ) + Double.random(in: 0...weights.jitter, using: &generator)
+                )
+            }
+            .sorted { $0.1 > $1.1 }
+            .map(\.0)
+    }
+
+    /// 復習期限、弱点度、未出題補正、シナリオ必要度から優先度を出す。
+    private static func priority(
+        for question: LearningQuestion,
+        mastery: QuestionMastery?,
+        origin: LearningSessionOrigin,
+        at date: Date,
+        weights: SelectionWeights
+    ) -> Double {
+        guard let mastery else { return weights.unseen + scenarioBonus(question, origin: origin, weights: weights) }
+
+        var score = 0.0
+        switch mastery.state(at: date) {
+        case .unseen:
+            score += weights.unseen
+        case .dueForReview, .relearning:
+            score += weights.dueForReview
+        case .learning:
+            score += weights.weakness
+        case .provisional:
+            score += weights.weakness / 2
+        case .mastered:
+            score += weights.mastered
+        }
+
+        score += Double(mastery.incorrectStreak) * weights.weakness / 2
+        return score + scenarioBonus(question, origin: origin, weights: weights)
+    }
+
+    private static func scenarioBonus(
+        _ question: LearningQuestion,
+        origin: LearningSessionOrigin,
+        weights: SelectionWeights
+    ) -> Double {
+        guard case let .scenario(scenarioID) = origin else { return 0 }
+        return question.scenarioIDs.contains(scenarioID) ? weights.scenarioNeed : 0
     }
 }
 
@@ -161,9 +360,9 @@ struct LearningSessionState: Equatable, Sendable {
     /// 教材の原稿順そのままのセッション。計画が教材と食い違わないため失敗しない。
     init(contentPack: LearningContentPack) {
         contentVersion = contentPack.version
-        questions = contentPack.questions
+        questions = contentPack.deliverableQuestions
         plan = LearningSessionPlan(
-            entries: contentPack.questions.map { question in
+            entries: contentPack.deliverableQuestions.map { question in
                 LearningSessionPlan.Entry(
                     questionID: question.id,
                     choiceIDs: question.choices.map(\.id)

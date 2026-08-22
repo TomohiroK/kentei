@@ -1,49 +1,9 @@
 import SwiftUI
 
-private struct ScenarioCardData: Identifiable {
-    let id: String
-    let title: LocalizedStringKey
-    let subtitle: LocalizedStringKey
-    let icon: String
-    let progress: Double
-    let tint: Color
-}
-
 struct ScenarioAtlasView: View {
-    private let scenarios = [
-        ScenarioCardData(
-            id: "airport",
-            title: "atlas.airport",
-            subtitle: "atlas.airport.detail",
-            icon: "airplane.departure",
-            progress: 0.72,
-            tint: KenteiTheme.brandPrimary
-        ),
-        ScenarioCardData(
-            id: "warung",
-            title: "atlas.warung",
-            subtitle: "atlas.warung.detail",
-            icon: "fork.knife",
-            progress: 0.45,
-            tint: KenteiTheme.brandAccent
-        ),
-        ScenarioCardData(
-            id: "convenience",
-            title: "atlas.convenience",
-            subtitle: "atlas.convenience.detail",
-            icon: "basket.fill",
-            progress: 0.28,
-            tint: .orange
-        ),
-        ScenarioCardData(
-            id: "grab",
-            title: "atlas.grab",
-            subtitle: "atlas.grab.detail",
-            icon: "car.fill",
-            progress: 0.18,
-            tint: .green
-        )
-    ]
+    let progressList: [ScenarioProgress]
+    let totalAchievement: Double
+    let onSelectScenario: (ScenarioProgress) -> Void
 
     var body: some View {
         NavigationStack {
@@ -53,8 +13,14 @@ struct ScenarioAtlasView: View {
 
                     SectionTitle(title: "atlas.scenes")
 
-                    ForEach(scenarios) { scenario in
-                        scenarioCard(scenario)
+                    ForEach(progressList) { progress in
+                        Button {
+                            onSelectScenario(progress)
+                        } label: {
+                            scenarioCard(progress)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("atlas.scenario.\(progress.scenario.id.rawValue)")
                     }
                 }
                 .padding(.horizontal, KenteiTheme.horizontalPadding)
@@ -78,48 +44,83 @@ struct ScenarioAtlasView: View {
                     Text("atlas.hero.detail")
                         .font(.subheadline)
                         .foregroundStyle(KenteiTheme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Spacer()
+                Spacer(minLength: 8)
 
-                ProgressRing(progress: 0.41, label: "41%", size: 82)
+                ProgressRing(
+                    progress: totalAchievement,
+                    label: "\(Int((totalAchievement * 100).rounded()))%",
+                    size: 82
+                )
             }
         }
     }
 
-    private func scenarioCard(_ scenario: ScenarioCardData) -> some View {
-        Button(action: {}) {
-            KenteiCard {
-                HStack(spacing: 16) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(scenario.tint.opacity(0.12))
-                        Image(systemName: scenario.icon)
-                            .font(.title2)
-                            .foregroundStyle(scenario.tint)
-                    }
-                    .frame(width: 62, height: 62)
+    private func scenarioCard(_ progress: ScenarioProgress) -> some View {
+        KenteiCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 14) {
+                    Image(systemName: progress.scenario.systemImage)
+                        .font(.title2)
+                        .foregroundStyle(KenteiTheme.brandPrimary)
+                        .frame(width: 52, height: 52)
+                        .background(
+                            KenteiTheme.brandPrimarySoft,
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        )
 
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text(scenario.title)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(LocalizedStringKey(progress.scenario.titleKey))
                             .font(.headline)
                             .foregroundStyle(KenteiTheme.textPrimary)
-                        Text(scenario.subtitle)
-                            .font(.caption)
+                        Text(LocalizedStringKey(progress.scenario.detailKey))
+                            .font(.subheadline)
                             .foregroundStyle(KenteiTheme.textSecondary)
-
-                        ProgressView(value: scenario.progress)
-                            .tint(scenario.tint)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    Text("\(Int((scenario.progress * 100).rounded()))%")
-                        .font(.subheadline.bold().monospacedDigit())
-                        .foregroundStyle(scenario.tint)
+                    Spacer(minLength: 4)
+
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(KenteiTheme.textSecondary)
                 }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        // 達成率は解放済み行動の割合。数字の意味を必ず添える。
+                        Text("atlas.unlockedActions")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KenteiTheme.textSecondary)
+                        Text("\(progress.unlockedActionCount) / \(progress.actionStatuses.count)")
+                            .font(.caption.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(KenteiTheme.textSecondary)
+                        Spacer()
+                        Text("\(Int((progress.achievement * 100).rounded()))%")
+                            .font(.subheadline.bold().monospacedDigit())
+                            .foregroundStyle(KenteiTheme.brandPrimary)
+                    }
+
+                    ProgressView(value: progress.achievement)
+                        .tint(KenteiTheme.brandPrimary)
+
+                    if progress.dueForReviewQuestionIDs.isEmpty == false {
+                        Label {
+                            HStack(spacing: 4) {
+                                Text("atlas.dueForReview")
+                                Text("\(progress.dueForReviewQuestionIDs.count)")
+                                    .monospacedDigit()
+                            }
+                        } icon: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+                    }
+                }
+                .accessibilityElement(children: .combine)
             }
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("atlas.scenario.\(scenario.id)")
     }
 }
-

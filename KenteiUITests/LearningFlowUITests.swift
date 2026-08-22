@@ -128,6 +128,51 @@ final class LearningFlowUITests: XCTestCase {
         )
     }
 
+    // MARK: - 生活図鑑
+
+    func testSelectingScenarioOpensDetailAndStartsLearning() {
+        app.launchArguments = ["-resetLearningData", "-skipOnboarding", "-showAtlas"]
+        app.launch()
+
+        let card = app.buttons["atlas.scenario.warung"]
+        XCTAssertTrue(card.waitForExistence(timeout: 8), "生活図鑑にカテゴリが並ぶ")
+
+        card.tap()
+
+        let start = app.buttons["atlas.startScenario"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5), "カテゴリを選ぶと詳細が開く")
+
+        // 解放判定に使った設定版を画面に示し、根拠を再現できるようにしている。
+        let versionLabel = app.staticTexts.matching(
+            NSPredicate(format: "label BEGINSWITH %@", "unlock-")
+        ).firstMatch
+        XCTAssertTrue(versionLabel.exists, "解放条件の設定版を示す")
+
+        start.tap()
+
+        XCTAssertTrue(
+            app.buttons["session.playAudio"].waitForExistence(timeout: 5),
+            "その場面の学習が始まる"
+        )
+    }
+
+    func testReviewEntryStartsASession() {
+        app.launchArguments = ["-resetLearningData", "-skipOnboarding"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["home.startLesson"].waitForExistence(timeout: 8))
+        app.tabBars.buttons.element(boundBy: 1).tap()
+
+        let review = app.buttons["learn.review"]
+        XCTAssertTrue(review.waitForExistence(timeout: 5), "学習入口に復習がある")
+        review.tap()
+
+        XCTAssertTrue(
+            app.buttons["session.playAudio"].waitForExistence(timeout: 5),
+            "復習からも同じ教材で学習が始まる"
+        )
+    }
+
     // MARK: - 初回導入
 
     func testOnboardingLeadsIntoFirstSession() {

@@ -135,4 +135,15 @@ enum TestSession {
         var generator = SeededRandomNumberGenerator(seed: seed)
         return LearningSessionPlanner.makePlan(from: pack, using: &generator)
     }
+
+    /// 出題を指定して作る計画。特定の問題に依存するテストで使う。
+    static func makePlan(questionNumbers: [Int], pack: LearningContentPack = DemoLearningContent.pack) -> LearningSessionPlan {
+        LearningSessionPlan(
+            entries: questionNumbers.compactMap { number in
+                let questionID = QuestionID(rawValue: "demo-question-\(number)")
+                guard let question = pack.question(with: questionID) else { return nil }
+                return LearningSessionPlan.Entry(questionID: questionID, choiceIDs: question.choices.map(\.id))
+            }
+        )
+    }
 }
