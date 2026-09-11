@@ -7,7 +7,7 @@ import Foundation
 /// 誤答は無作為に作らず、音の類似・意味の近さ・場面違いのいずれかの理由を持たせる。
 enum DemoLearningContent {
     /// 教材を差し替えたら版を上げる。版が変わると保存済みセッションは復帰せず破棄される。
-    static let version = "demo-2026-08-v5"
+    static let version = "demo-2026-08-v7"
 
     static var pack: LearningContentPack {
         LearningContentPack(version: version, questions: questions)
@@ -77,6 +77,32 @@ enum DemoLearningContent {
     ) -> Template {
         dialogue(first, second, choices, explanation, scenarios,
                  level: .d, type: .contentMatch, distractorReason: distractorReason)
+    }
+
+    /// C級。生活手続きの説明を理解する。接辞と受動を含む文を扱う。
+    private static func singleC(
+        _ text: String,
+        _ choices: [String],
+        _ explanation: String,
+        _ scenarios: [ScenarioID],
+        type: QuestionType = .audioMeaningChoice,
+        distractorReason: DistractorReason = .differentAffix
+    ) -> Template {
+        single(text, choices, explanation, scenarios,
+               level: .c, type: type, distractorReason: distractorReason)
+    }
+
+    /// C級の会話。手続きのやりとりを聞き、内容と合うものを選ぶ。
+    private static func contentMatchC(
+        _ first: String,
+        _ second: String,
+        _ choices: [String],
+        _ explanation: String,
+        _ scenarios: [ScenarioID],
+        distractorReason: DistractorReason = .semanticNeighbor
+    ) -> Template {
+        dialogue(first, second, choices, explanation, scenarios,
+                 level: .c, type: .contentMatch, distractorReason: distractorReason)
     }
 
     /// D級の行動判断。案内を聞いて、その場で取るべき行動を選ぶ。
@@ -305,7 +331,214 @@ enum DemoLearningContent {
         actionDecisionD("Pembayaran hanya bisa tunai, ya.",
                         ["現金を用意する", "カードを出す",
                          "QRISで払う", "後日払うと伝える"],
-                        "hanya bisa tunai は「現金のみ」です。", [.warung])
+                        "hanya bisa tunai は「現金のみ」です。", [.warung]),
+
+        // --- C級: 病院 ---
+        singleC("Silakan didaftarkan dulu di loket pendaftaran.",
+                ["先に受付窓口で登録してください", "先に受付窓口で支払ってください",
+                 "受付窓口で書類を受け取ってください", "受付窓口で順番を待ってください"],
+                "didaftarkan は daftar（登録）の受動形。di- + -kan で「登録してもらう」を表します。", [.hospital]),
+        contentMatchC("Sudah berapa lama demamnya?", "Sejak kemarin malam, disertai batuk.",
+                      ["昨夜から熱があり、咳を伴うと答えた", "今朝から熱があり、頭痛を伴うと答えた",
+                       "昨夜から咳だけがあると答えた", "熱は下がったが咳が残ると答えた"],
+                      "disertai は sertai の受動で「〜を伴う」。sejak は「〜から」です。", [.hospital]),
+        singleC("Obatnya harus diminum setelah makan.",
+                ["薬は食後に飲む必要がある", "薬は食前に飲む必要がある",
+                 "薬は食事と一緒に飲む必要がある", "薬は寝る前に飲む必要がある"],
+                "diminum は minum の受動形。harus は義務、setelah makan は食後です。", [.hospital],
+                type: .grammarFunctionChoice),
+
+        // --- C級: 薬局 ---
+        singleC("Resepnya bisa ditebus di apotek sebelah.",
+                ["処方箋は隣の薬局で受け取れる", "処方箋は隣の薬局で書いてもらえる",
+                 "処方箋は病院の窓口で受け取る", "処方箋は明日また持ってくる"],
+                "ditebus は tebus（引き換える）の受動。処方箋を薬に換えることを指します。", [.pharmacy]),
+        singleC("Jangan dikonsumsi bersamaan dengan alkohol.",
+                ["アルコールと一緒に摂取しない", "アルコールの後に摂取する",
+                 "アルコールの代わりに摂取する", "アルコールと一緒なら少量にする"],
+                "dikonsumsi は konsumsi の受動。jangan で禁止、bersamaan dengan は「〜と同時に」。",
+                [.pharmacy], type: .grammarFunctionChoice),
+        contentMatchC("Ada efek sampingnya?", "Bisa mengantuk, jadi jangan menyetir.",
+                      ["眠気が出るため運転しないよう言われた", "副作用は無いと言われた",
+                       "眠気が出るため水を多く飲むよう言われた", "運転しても問題ないと言われた"],
+                      "efek samping は副作用、mengantuk は「眠くなる」、menyetir は「運転する」です。", [.pharmacy]),
+
+        // --- C級: 銀行 ---
+        singleC("Rekeningnya akan diaktifkan dalam dua hari kerja.",
+                ["口座は2営業日以内に有効化される", "口座は2日以内に解約される",
+                 "口座は2週間以内に有効化される", "口座は当日中に有効化される"],
+                "diaktifkan は aktif の受動使役形。hari kerja は営業日です。", [.bank]),
+        singleC("Transfer antarbank dikenakan biaya administrasi.",
+                ["他行宛ての送金には手数料がかかる", "他行宛ての送金は手数料が無料になる",
+                 "同じ銀行宛ての送金に手数料がかかる", "送金の上限額が決まっている"],
+                "dikenakan は kena の受動使役で「課される」。antarbank は銀行間です。", [.bank]),
+        contentMatchC("Duitnya belum masuk, ya?", "Dananya sedang diproses, Pak.",
+                      ["入金がまだで、処理中だと説明された", "入金は完了したと説明された",
+                       "入金が取り消されたと説明された", "入金額が違うと説明された"],
+                      "duit は口語、dana は標準語で「お金・資金」。diproses は「処理される」です。",
+                      [.bank], distractorReason: .registerConfusion),
+
+        // --- C級: SIM・通信 ---
+        singleC("Kartunya harus diregistrasi dengan nomor KTP.",
+                ["SIMはKTP番号で登録する必要がある", "SIMはパスポート番号で登録する必要がある",
+                 "SIMは登録しなくても使える", "SIMは店舗でしか買えない"],
+                "diregistrasi は registrasi の受動。KTP はインドネシアの身分証です。", [.simCard]),
+        singleC("Kuotanya habis, silakan diisi ulang.",
+                ["データ容量が切れたので、チャージしてください", "データ容量はまだ残っている",
+                 "電池が切れたので充電してください", "契約が切れたので更新してください"],
+                "kuota はデータ容量、diisi ulang は「補充される」＝チャージです。", [.simCard]),
+        contentMatchC("Paketnya berlaku berapa lama?", "Berlaku tiga puluh hari sejak diaktifkan.",
+                      ["有効化から30日間有効だと答えた", "購入から13日間有効だと答えた",
+                       "有効化から3日間有効だと答えた", "使い切るまで有効だと答えた"],
+                      "berlaku は「有効である」。tiga puluh（30）と tiga belas（13）を聞き分けます。", [.simCard]),
+
+        // --- C級: 配送 ---
+        singleC("Paketnya akan dikirim ulang besok pagi.",
+                ["荷物は明日の午前に再配達される", "荷物は明日の午後に再配達される",
+                 "荷物は差出人へ返送される", "荷物は営業所で受け取る"],
+                "dikirim ulang は「再び送られる」。kirim の受動に ulang（再び）が付きます。", [.delivery]),
+        contentMatchC("Paketnya sudah sampai?", "Sudah, diterima oleh penjaga kos.",
+                      ["下宿の管理人が受け取り済みだと答えた", "まだ届いていないと答えた",
+                       "本人が受け取ったと答えた", "配達員が持ち帰ったと答えた"],
+                      "diterima は terima の受動、oleh は行為者を示します。", [.delivery]),
+        singleC("Nomor resinya bisa dilacak lewat aplikasi.",
+                ["追跡番号はアプリで追跡できる", "追跡番号は電話でしか確認できない",
+                 "追跡番号は発行されない", "追跡番号は配達完了後に届く"],
+                "resi は送り状番号、dilacak は lacak（追跡する）の受動です。", [.delivery]),
+
+        // --- C級: 家 ---
+        singleC("Sewanya dibayarkan setiap tanggal lima.",
+                ["家賃は毎月5日に支払う", "家賃は毎月15日に支払う",
+                 "家賃は3か月ごとに支払う", "家賃は入居時に一括で支払う"],
+                "dibayarkan は bayar の受動使役。tanggal lima は5日です。", [.housing]),
+        singleC("AC-nya rusak, tolong diperbaiki secepatnya.",
+                ["エアコンが壊れたので、早急に修理してほしい", "エアコンを新しく設置してほしい",
+                 "エアコンの掃除をしてほしい", "エアコンの使い方を教えてほしい"],
+                "diperbaiki は baik から派生した「修理される」。secepatnya は「できるだけ早く」。", [.housing]),
+        singleC("Kontraknya diperpanjang otomatis kalau tidak dibatalkan.",
+                ["解約しなければ契約は自動更新される", "解約しなければ契約は終了する",
+                 "契約は毎回手続きが必要になる", "契約は自動で解約される"],
+                "diperpanjang は panjang（長い）の受動使役で「延長される」。dibatalkan は「取り消される」。",
+                [.housing], type: .grammarFunctionChoice),
+
+        // --- C級: 警察 ---
+        singleC("Laporan kehilangan bisa dibuat di kantor polisi terdekat.",
+                ["紛失届は最寄りの警察署で作成できる", "紛失届は大使館で作成する",
+                 "紛失届は電話でのみ受け付ける", "紛失届は翌日以降に受け付ける"],
+                "kehilangan は hilang の ke-an 名詞形で「紛失」。dibuat は「作られる」です。", [.police]),
+        singleC("Surat keterangannya diperlukan untuk mengurus paspor baru.",
+                ["新しいパスポートの手続きに証明書が必要になる", "証明書は不要になった",
+                 "証明書は帰国後に提出する", "証明書はパスポートの代わりに使える"],
+                "keterangan は terang の名詞形、diperlukan は perlu の受動で「必要とされる」。", [.police]),
+        contentMatchC("Ada yang bisa dijadikan bukti?", "Ada rekaman CCTV-nya.",
+                      ["証拠になるものとしてCCTVの記録があると答えた", "証拠は何も無いと答えた",
+                       "目撃者がいると答えた", "レシートが残っていると答えた"],
+                      "dijadikan は jadi の受動使役で「〜にされる」。bukti は証拠です。", [.police]),
+
+        // --- C級: 行政 ---
+        singleC("Perpanjangan visanya diurus di kantor imigrasi.",
+                ["ビザの延長は入国管理局で手続きする", "ビザの延長は大使館で手続きする",
+                 "ビザの延長は空港で手続きする", "ビザの延長は郵送で手続きする"],
+                "perpanjangan は panjang の per-an 名詞形。diurus は urus の受動です。", [.government]),
+        singleC("Dokumennya harus dilegalisasi terlebih dahulu.",
+                ["書類は先に認証を受ける必要がある", "書類は後から提出すればよい",
+                 "書類は翻訳するだけでよい", "書類は原本を保管しておく"],
+                "dilegalisasi は「認証される」。terlebih dahulu は「まず先に」です。", [.government]),
+        contentMatchC("Antrean online-nya dibuka jam berapa?", "Dibuka setiap pukul delapan pagi.",
+                      ["オンライン受付は毎朝8時に開くと答えた", "オンライン受付は毎朝7時に開くと答えた",
+                       "オンライン受付は不要だと答えた", "オンライン受付は夜8時に開くと答えた"],
+                      "dibuka は buka の受動。pukul delapan pagi は朝8時です。", [.government]),
+
+        // --- C級: 職場 ---
+        singleC("Laporannya dikumpulkan paling lambat hari Jumat.",
+                ["報告書は遅くとも金曜までに提出する", "報告書は金曜以降に提出する",
+                 "報告書は月曜までに提出する", "報告書の提出は任意である"],
+                "dikumpulkan は kumpul の受動使役で「集められる＝提出される」。paling lambat は「遅くとも」。",
+                [.workplace]),
+        singleC("Rapatnya diundur ke minggu depan.",
+                ["会議は来週に延期された", "会議は今週に前倒しされた",
+                 "会議は中止になった", "会議は来月に延期された"],
+                "diundur は undur の受動で「後ろへずらされる」＝延期です。", [.workplace]),
+        singleC("Bisa tolong dikirimkan datanya?",
+                ["承知しました、夕方に送ります", "承知しました、データを消します",
+                 "すみません、データは受け取れません", "承知しました、印刷しておきます"],
+                "dikirimkan は kirim の受動使役。依頼に対する定型応答を選びます。",
+                [.workplace], type: .responseChoice, distractorReason: .wrongContext),
+
+        // --- C級: 実戦チェック用の追加分 ---
+        singleC("Silakan menunggu, nanti akan dipanggil namanya.",
+                ["名前が呼ばれるまで待つ", "名前を書いてから待つ",
+                 "呼ばれたら受付へ戻る", "名前を伝えてから座る"],
+                "dipanggil は panggil の受動で「呼ばれる」。akan は未来を表します。", [.hospital]),
+        contentMatchC("Ada alergi obat?", "Ada, saya alergi antibiotik tertentu.",
+                      ["特定の抗生物質にアレルギーがあると答えた", "薬のアレルギーは無いと答えた",
+                       "食物アレルギーがあると答えた", "以前あったが今は無いと答えた"],
+                      "tertentu は「特定の」。alergi の対象を聞き取ります。", [.hospital]),
+        singleC("Obat ini dijual bebas tanpa resep.",
+                ["この薬は処方箋なしで買える", "この薬は処方箋が必要になる",
+                 "この薬は在庫切れである", "この薬は無料で配られる"],
+                "dijual bebas は「市販されている」。tanpa resep は処方箋なしです。", [.pharmacy]),
+        singleC("Simpan obatnya di tempat yang tidak terkena sinar matahari.",
+                ["薬は直射日光の当たらない場所に保管する", "薬は日の当たる場所に置く",
+                 "薬は冷凍庫で保管する", "薬は開封後すぐ捨てる"],
+                "terkena は kena の ter- 形で「当たってしまう」。sinar matahari は日光です。",
+                [.pharmacy], type: .grammarFunctionChoice),
+        singleC("Buku tabungannya akan dicetak sekarang.",
+                ["通帳は今記帳される", "通帳は後日発行される",
+                 "通帳は再発行が必要になる", "通帳はもう使えない"],
+                "dicetak は cetak（印刷する）の受動。buku tabungan は通帳です。", [.bank]),
+        contentMatchC("Kartunya tertelan mesin ATM.", "Nanti diblokir dulu, ya.",
+                      ["カードがATMに飲み込まれ、まず利用停止にすると言われた", "カードが壊れたので再発行すると言われた",
+                       "カードはすぐ返却されると言われた", "暗証番号を変更すると言われた"],
+                      "tertelan は telan の ter- 形で「意図せず飲み込まれる」。diblokir は「停止される」。", [.bank]),
+        singleC("Nomornya akan dinonaktifkan kalau tidak diisi selama tiga bulan.",
+                ["3か月チャージしないと番号が停止される", "3か月使わないと料金が上がる",
+                 "3日チャージしないと番号が停止される", "3か月ごとに番号が変わる"],
+                "dinonaktifkan は「無効化される」。diisi は「補充される」＝チャージです。", [.simCard]),
+        singleC("Sinyalnya lemah di daerah ini.",
+                ["この地域は電波が弱い", "この地域は電波が強い",
+                 "この地域では通話ができない", "この地域はデータ通信が無料になる"],
+                "sinyal は電波、lemah は「弱い」。daerah は地域です。", [.simCard]),
+        singleC("Barangnya dibungkus ulang karena kemasannya rusak.",
+                ["梱包が壊れていたので再梱包された", "商品が壊れていたので交換された",
+                 "梱包が大きすぎたので分けられた", "商品は返送された"],
+                "dibungkus ulang は「再び包まれる」。kemasan は梱包です。", [.delivery]),
+        singleC("Ongkos kirimnya dibayar di tempat.",
+                ["送料は受け取り時に払う", "送料は事前に払う",
+                 "送料は無料である", "送料は差出人が払う"],
+                "ongkos kirim は送料、dibayar di tempat は着払いです。", [.delivery]),
+        singleC("Listriknya dibayar terpisah dari sewa.",
+                ["電気代は家賃とは別に払う", "電気代は家賃に含まれる",
+                 "電気代は大家が払う", "電気代は年に一度払う"],
+                "terpisah は pisah の ter- 形で「分かれている」。sewa は家賃です。", [.housing]),
+        singleC("Kunci cadangannya dititipkan ke penjaga.",
+                ["予備の鍵は管理人に預けてある", "予備の鍵は無くなった",
+                 "予備の鍵は自分で保管する", "予備の鍵は大家が持っている"],
+                "cadangan は予備、dititipkan は titip の受動使役で「預けられる」。", [.housing]),
+        singleC("Barang temuan bisa diambil di bagian informasi.",
+                ["落とし物は案内所で受け取れる", "落とし物は警察署で受け取る",
+                 "落とし物は処分された", "落とし物は郵送される"],
+                "temuan は temu の名詞形で「拾得物」。diambil は「取られる＝受け取れる」。", [.police]),
+        singleC("Kejadiannya harus dilaporkan dalam dua puluh empat jam.",
+                ["出来事は24時間以内に届け出る必要がある", "出来事は48時間以内に届け出る",
+                 "出来事の届け出は任意である", "出来事は翌週までに届け出る"],
+                "kejadian は jadi の名詞形で「出来事」。dilaporkan は「報告される」。", [.police]),
+        singleC("Formulirnya diisi dengan huruf kapital.",
+                ["用紙は大文字で記入する", "用紙は小文字で記入する",
+                 "用紙は鉛筆で記入する", "用紙は係員が記入する"],
+                "diisi は isi の受動で「記入される」。huruf kapital は大文字です。", [.government]),
+        singleC("Biayanya dibayarkan lewat bank, bukan di loket.",
+                ["費用は窓口ではなく銀行で払う", "費用は窓口で払う",
+                 "費用はオンラインでのみ払える", "費用は不要である"],
+                "dibayarkan は「支払われる」。bukan で「〜ではない」を示します。", [.government]),
+        singleC("Cutinya harus diajukan seminggu sebelumnya.",
+                ["休暇は1週間前に申請する必要がある", "休暇は当日に申請できる",
+                 "休暇は1か月前に申請する", "休暇の申請は不要である"],
+                "cuti は休暇、diajukan は aju の受動使役で「提出される」。", [.workplace]),
+        contentMatchC("Hasilnya sudah dikirim?", "Sudah, tadi pagi dikirimkan ke klien.",
+                      ["今朝クライアントへ送付済みだと答えた", "まだ送っていないと答えた",
+                       "昨夜クライアントへ送ったと答えた", "上司へ送ったと答えた"],
+                      "dikirimkan は「送られる」。tadi pagi は「今朝」です。", [.workplace])
     ]
 
     static let questions: [LearningQuestion] = templates.enumerated().compactMap { index, template in

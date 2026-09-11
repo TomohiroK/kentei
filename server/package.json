@@ -1,0 +1,24 @@
+{
+  "name": "kentei-assessment-relay",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Kentei の採点中継。APIキーを端末へ置かないための最小サーバー。",
+  "scripts": {
+    "vercel-build": "esbuild src/handler.ts --bundle --platform=node --format=esm --target=node22 --packages=external --outfile=api/assess.js && esbuild src/attestHandler.ts --bundle --platform=node --format=esm --target=node22 --packages=external --outfile=api/attest.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types 'src/**/*.test.ts'"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
+    "@upstash/redis": "^1.38.2",
+    "cbor-x": "^1.6.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vercel/node": "^5.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  }
+}

@@ -15,12 +15,19 @@ enum CertificationLevel: String, CaseIterable, Codable, Sendable {
         "\(rawValue.uppercased())級"
     }
 
-    var isAvailableInMVP: Bool {
-        self == .e || self == .d
+    /// 選択式問題を用意している級。
+    ///
+    /// B級・A級は作文と面接だけで構成するため、ここには含めない。
+    /// これらの入口は `AdvancedTaskCatalog` が別に持つ。
+    var isProvided: Bool {
+        switch self {
+        case .e, .d, .c: true
+        case .b, .a: false
+        }
     }
 
     static var availableLevels: [CertificationLevel] {
-        allCases.filter(\.isAvailableInMVP)
+        allCases.filter(\.isProvided)
     }
 }
 
@@ -38,12 +45,13 @@ enum QuestionType: String, Codable, Sendable {
     case summarization
     case relatedWords = "related_words"
 
-    /// 固定問題として即時採点できる形式か。AI評価が要る形式はMVPで出題しない。
-    var isDeliverableInMVP: Bool {
+    /// 固定問題として即時採点できる形式か。AI評価が要る形式は出題しない。
+    var isDeliverable: Bool {
         switch self {
-        case .audioMeaningChoice, .responseChoice, .contentMatch, .actionDecision:
+        case .audioMeaningChoice, .responseChoice, .contentMatch, .actionDecision,
+             .grammarFunctionChoice:
             true
-        case .audioImageChoice, .grammarFunctionChoice, .ordering, .fillInBlank,
+        case .audioImageChoice, .ordering, .fillInBlank,
              .speaking, .summarization, .relatedWords:
             false
         }
@@ -166,10 +174,10 @@ struct ContentPackValidator: Sendable {
         if question.choices.contains(where: { $0.isCorrect == false && $0.distractorReason == nil }) {
             issues.append(.missingDistractorReason(question.id))
         }
-        if question.level.isAvailableInMVP == false {
+        if question.level.isProvided == false {
             issues.append(.unavailableLevel(question.id, question.level))
         }
-        if question.questionType.isDeliverableInMVP == false {
+        if question.questionType.isDeliverable == false {
             issues.append(.undeliverableQuestionType(question.id, question.questionType))
         }
 

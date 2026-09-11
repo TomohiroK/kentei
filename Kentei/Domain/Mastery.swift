@@ -163,6 +163,9 @@ struct ActionUnlockStatus: Identifiable, Equatable, Sendable {
     let action: LifeAction
     let masteredQuestionIDs: [QuestionID]
     let isUnlocked: Bool
+    /// 実戦チェックの合格も条件か。条件なら合否も根拠に含める。
+    let requiresPracticalCheck: Bool
+    let hasPassedPracticalCheck: Bool
     let policyVersion: String
     let atlasVersion: String
 
@@ -180,6 +183,11 @@ struct ActionUnlockStatus: Identifiable, Equatable, Sendable {
     var remainingCount: Int {
         max(requiredCount - masteredCount, 0)
     }
+
+    /// 問題は足りているが、実戦チェックだけが残っている状態。
+    var awaitsPracticalCheck: Bool {
+        requiresPracticalCheck && hasPassedPracticalCheck == false && remainingCount == 0
+    }
 }
 
 /// 生活図鑑のカテゴリ1件の進捗。
@@ -189,6 +197,12 @@ struct ScenarioProgress: Identifiable, Equatable, Sendable {
     let questionCount: Int
     let masteredQuestionCount: Int
     let dueForReviewQuestionIDs: [QuestionID]
+    /// 直近の実戦チェック結果。未実施なら nil。
+    let practicalCheck: PracticalCheckResult?
+
+    var requiresPracticalCheck: Bool {
+        scenario.actions.contains { $0.requiresPracticalCheck }
+    }
 
     var id: ScenarioID { scenario.id }
 
@@ -217,10 +231,11 @@ struct LifeAtlasEvaluator: Sendable {
         for scenario: LifeScenario,
         pack: LearningContentPack,
         mastery: [QuestionID: QuestionMastery],
+        practicalCheck: PracticalCheckResult? = nil,
         at date: Date
     ) -> ScenarioProgress {
         let statuses = scenario.actions.map { action in
-            unlockStatus(for: action, mastery: mastery, at: date)
+            unlockStatus(for: action, mastery: mastery, practicalCheck: practicalCheck, at: date)
         }
 
         let questionIDs = scenario.questionIDs(in: pack)
@@ -232,13 +247,15 @@ struct LifeAtlasEvaluator: Sendable {
             actionStatuses: statuses,
             questionCount: questionIDs.count,
             masteredQuestionCount: masteredQuestionIDs.count,
-            dueForReviewQuestionIDs: dueForReview
+            dueForReviewQuestionIDs: dueForReview,
+            practicalCheck: practicalCheck
         )
     }
 
     func unlockStatus(
         for action: LifeAction,
         mastery: [QuestionID: QuestionMastery],
+        practicalCheck: PracticalCheckResult? = nil,
         at date: Date
     ) -> ActionUnlockStatus {
         let mastered = action.requiredQuestionIDs.filter { mastery[$0]?.isMastered(at: date) == true }
@@ -246,10 +263,17 @@ struct LifeAtlasEvaluator: Sendable {
             ? 0
             : Double(mastered.count) / Double(action.requiredQuestionIDs.count)
 
+        let hasPassed = practicalCheck?.isPassed == true
+        let meetsMastery = ratio >= policy.requiredMasteredRatio
+        // 実戦チェックが要る行動は、問題の習得だけでは解放しない。
+        let isUnlocked = meetsMastery && (action.requiresPracticalCheck == false || hasPassed)
+
         return ActionUnlockStatus(
             action: action,
             masteredQuestionIDs: mastered,
-            isUnlocked: ratio >= policy.requiredMasteredRatio,
+            isUnlocked: isUnlocked,
+            requiresPracticalCheck: action.requiresPracticalCheck,
+            hasPassedPracticalCheck: hasPassed,
             policyVersion: policy.version,
             atlasVersion: atlasVersion
         )

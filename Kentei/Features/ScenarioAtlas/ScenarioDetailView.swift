@@ -7,6 +7,7 @@ import SwiftUI
 struct ScenarioDetailView: View {
     let progress: ScenarioProgress
     let onStartLearning: (ScenarioID) -> Void
+    let onStartPracticalCheck: (ScenarioID) -> Void
 
     @Environment(\.dismiss) private var dismiss
 
@@ -15,6 +16,10 @@ struct ScenarioDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     summary
+
+                    if progress.requiresPracticalCheck {
+                        practicalCheckCard
+                    }
 
                     SectionTitle(title: "atlas.actions")
 
@@ -77,6 +82,66 @@ struct ScenarioDetailView: View {
         }
     }
 
+    /// 実戦チェック。実際に使えるかを確かめてから行動を解放する。
+    private var practicalCheckCard: some View {
+        KenteiCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    Image(systemName: practicalCheckIcon)
+                        .foregroundStyle(practicalCheckTint)
+                    Text("atlas.practicalCheck")
+                        .font(.headline)
+                        .foregroundStyle(KenteiTheme.textPrimary)
+                    Spacer(minLength: 4)
+                    Text(practicalCheckStatusKey)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(practicalCheckTint)
+                }
+                .accessibilityElement(children: .combine)
+
+                if let result = progress.practicalCheck {
+                    Text("atlas.practicalCheck.score")
+                        .font(.caption)
+                        .foregroundStyle(KenteiTheme.textSecondary)
+                    Text("\(result.correctCount) / \(result.questionCount)")
+                        .font(.headline.monospacedDigit())
+                        .foregroundStyle(KenteiTheme.textPrimary)
+                }
+
+                Text("atlas.practicalCheck.detail")
+                    .font(.caption)
+                    .foregroundStyle(KenteiTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button {
+                    onStartPracticalCheck(progress.scenario.id)
+                } label: {
+                    Label(
+                        progress.practicalCheck == nil ? "atlas.practicalCheck.start" : "atlas.practicalCheck.retry",
+                        systemImage: "checkmark.seal"
+                    )
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .accessibilityIdentifier("atlas.startPracticalCheck")
+            }
+        }
+    }
+
+    private var practicalCheckIcon: String {
+        guard let result = progress.practicalCheck else { return "seal" }
+        return result.isPassed ? "checkmark.seal.fill" : "exclamationmark.triangle.fill"
+    }
+
+    private var practicalCheckTint: Color {
+        guard let result = progress.practicalCheck else { return KenteiTheme.textSecondary }
+        return result.isPassed ? KenteiTheme.success : KenteiTheme.error
+    }
+
+    private var practicalCheckStatusKey: LocalizedStringKey {
+        guard let result = progress.practicalCheck else { return "atlas.practicalCheck.notTaken" }
+        return result.isPassed ? "atlas.practicalCheck.passed" : "atlas.practicalCheck.failed"
+    }
+
     private func actionRow(_ status: ActionUnlockStatus) -> some View {
         KenteiCard {
             VStack(alignment: .leading, spacing: 10) {
@@ -110,6 +175,13 @@ struct ScenarioDetailView: View {
                 .font(.caption)
                 .foregroundStyle(KenteiTheme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+                if status.awaitsPracticalCheck {
+                    Label("atlas.action.awaitsPracticalCheck", systemImage: "seal")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(KenteiTheme.brandPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .accessibilityElement(children: .combine)
         }

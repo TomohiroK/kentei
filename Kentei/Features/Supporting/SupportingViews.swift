@@ -2,7 +2,10 @@ import SwiftUI
 
 struct LearnView: View {
     let reviewDueCount: Int
+    let isAssessmentConfigured: Bool
     let onStartLearning: (LearningSessionOrigin) -> Void
+    let onStartWriting: (WritingTask) -> Void
+    var onStartOral: (OralTask) -> Void = { _ in }
 
     @State private var selectedLevel: CertificationLevel = .e
 
@@ -43,6 +46,8 @@ struct LearnView: View {
                         identifier: "learn.review",
                         action: { onStartLearning(.review) }
                     )
+
+                    advancedSection
                 }
                 .padding(.horizontal, KenteiTheme.horizontalPadding)
                 .padding(.bottom, 32)
@@ -50,6 +55,92 @@ struct LearnView: View {
             .background(KenteiTheme.skyBackground.ignoresSafeArea())
             .navigationTitle("learn.title")
         }
+    }
+
+    /// B級・A級の入口。
+    ///
+    /// 始められない課題も含めて常に出す。導線ごと消すと、利用者からは
+    /// 機能が存在しないように見え、いつ使えるようになるかも分からない。
+    private var advancedSection: some View {
+        VStack(spacing: 16) {
+            SectionTitle(title: "learn.advanced")
+
+            Text("learn.advanced.detail")
+                .font(.footnote)
+                .foregroundStyle(KenteiTheme.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(AdvancedTaskCatalog.entriesByLevel(isAssessmentConfigured: isAssessmentConfigured), id: \.level.rawValue) { group in
+                VStack(spacing: 12) {
+                    Text(group.level.displayText)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(KenteiTheme.brandAccent)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    ForEach(group.entries) { entry in
+                        advancedRow(entry)
+                    }
+                }
+            }
+        }
+    }
+
+    private func advancedRow(_ entry: AdvancedTaskEntry) -> some View {
+        Button {
+            if let task = entry.writingTask, entry.availability.canStart {
+                onStartWriting(task)
+            } else if let task = entry.oralTask, entry.availability.canStart {
+                onStartOral(task)
+            }
+        } label: {
+            KenteiCard {
+                HStack(spacing: 14) {
+                    Image(systemName: entry.taskType.requiresRecording ? "mic" : "square.and.pencil")
+                        .font(.title2)
+                        .foregroundStyle(entry.availability.canStart ? KenteiTheme.brandPrimary : KenteiTheme.textSecondary)
+                        .frame(width: 52, height: 52)
+                        .background(
+                            (entry.availability.canStart ? KenteiTheme.brandPrimary : KenteiTheme.textSecondary)
+                                .opacity(0.12),
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(LocalizedStringKey(entry.titleKey))
+                            .font(.headline)
+                            .foregroundStyle(entry.availability.canStart ? KenteiTheme.textPrimary : KenteiTheme.textSecondary)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        // 始められない場合は理由を、開始できるが条件がある場合は
+                        // 注意書きを出す。どちらもなければ課題の説明を出す。
+                        if let noticeKey = entry.availability.reasonKey ?? entry.noticeKey {
+                            Text(LocalizedStringKey(noticeKey))
+                                .font(.footnote)
+                                .foregroundStyle(KenteiTheme.textSecondary)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        } else {
+                            Text(LocalizedStringKey(entry.detailKey))
+                                .font(.subheadline)
+                                .foregroundStyle(KenteiTheme.textSecondary)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+
+                    Spacer(minLength: 4)
+
+                    Image(systemName: entry.availability.canStart ? "chevron.right" : "lock.fill")
+                        .font(.footnote.bold())
+                        .foregroundStyle(KenteiTheme.textSecondary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(entry.availability.canStart == false)
+        .accessibilityIdentifier("learn.advanced.\(entry.id)")
     }
 
     /// 級別入口で出す級。提供している級だけを並べる。
@@ -182,10 +273,16 @@ struct LearningProgressView: View {
         }
     }
 
+    /// リング内の表示。全級合計の習得率なので、級名ではなく割合を出す。
+    /// 級名を出すと、学習中の級と一致せず誤解を招く。
+    private var masteryRatioText: String {
+        "\(Int((masteryRatio * 100).rounded()))%"
+    }
+
     private var levelCard: some View {
         KenteiCard {
             HStack(spacing: 18) {
-                ProgressRing(progress: masteryRatio, label: "E級", size: 92)
+                ProgressRing(progress: masteryRatio, label: masteryRatioText, size: 92)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("progress.currentLevel")
@@ -235,7 +332,14 @@ struct LearningProgressView: View {
 
 struct SettingsView: View {
     let contentPack: LearningContentPack
+    let isAssessmentConfigured: Bool
+    let assessmentTokenSource: AssessmentTokenSource
     let contentIssueCount: Int
+    let pendingSyncCount: Int
+    let isOnline: Bool
+    let onDeleteLearningData: () -> Void
+
+    @State private var isShowingDeleteConfirmation = false
 
     @AppStorage(LearningPreferenceKey.playbackRate) private var playbackRate = PlaybackRate.standard.rawValue
     @AppStorage(LearningPreferenceKey.autoplay) private var autoplay = true
@@ -295,15 +399,71 @@ struct SettingsView: View {
                     }
                 }
 
-                Section("settings.data") {
-                    Label("settings.downloads", systemImage: "arrow.down.circle")
-                    Label("settings.privacy", systemImage: "hand.raised")
-                    Label("settings.help", systemImage: "questionmark.circle")
+                Section("settings.sync") {
+                    LabeledContent("settings.sync.connection") {
+                        Label(
+                            isOnline ? "settings.sync.online" : "settings.sync.offline",
+                            systemImage: isOnline ? "wifi" : "wifi.slash"
+                        )
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(isOnline ? KenteiTheme.success : KenteiTheme.textSecondary)
+                    }
+                    LabeledContent("settings.sync.pending") {
+                        Text("\(pendingSyncCount)")
+                            .monospacedDigit()
+                    }
+                    Text("settings.sync.detail")
+                        .font(.footnote)
+                        .foregroundStyle(KenteiTheme.textSecondary)
+                }
+
+                // 採点の状態。入力は求めない。トークンは開発中の都合であって、
+                // 学習者が知る必要のあるものではない。値そのものは表示しない。
+                Section("settings.assessment") {
+                    LabeledContent("settings.assessment.state") {
+                        Text(isAssessmentConfigured ? "settings.assessment.configured" : "settings.assessment.notConfigured")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(isAssessmentConfigured ? KenteiTheme.success : KenteiTheme.textSecondary)
+                    }
+                    LabeledContent("settings.assessment.source") {
+                        Text(LocalizedStringKey(assessmentTokenSource.descriptionKey))
+                            .font(.footnote)
+                            .foregroundStyle(KenteiTheme.textSecondary)
+                    }
+                    .accessibilityIdentifier("settings.assessmentSource")
+
+                    Text("settings.assessment.detail")
+                        .font(.footnote)
+                        .foregroundStyle(KenteiTheme.textSecondary)
+                }
+
+                Section("settings.privacy") {
+                    Text("settings.privacy.detail")
+                        .font(.footnote)
+                        .foregroundStyle(KenteiTheme.textSecondary)
+
+                    Button(role: .destructive) {
+                        isShowingDeleteConfirmation = true
+                    } label: {
+                        Label("settings.deleteData", systemImage: "trash")
+                    }
+                    .accessibilityIdentifier("settings.deleteData")
                 }
             }
             .scrollContentBackground(.hidden)
             .background(KenteiTheme.skyBackground)
             .navigationTitle("settings.title")
+            .confirmationDialog(
+                "settings.deleteData.title",
+                isPresented: $isShowingDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("settings.deleteData.confirm", role: .destructive, action: onDeleteLearningData)
+                    .accessibilityIdentifier("settings.deleteData.confirm")
+                Button("common.cancel", role: .cancel) {}
+            } message: {
+                Text("settings.deleteData.message")
+            }
         }
     }
 }

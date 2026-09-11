@@ -14,6 +14,7 @@ final class SpeechQuestionAudioPlayer: NSObject, QuestionAudioPlaying {
     private let audioSession: AVAudioSession
     private var activeContinuation: CheckedContinuation<Void, any Error>?
     private let interruptionObserver = NotificationObserverToken()
+    private let routeChangeObserver = NotificationObserverToken()
 
     /// 話者を切り替えるための音声候補。端末に存在するものだけを使う。
     private static let voiceIdentifiers = ["id-ID"]
@@ -23,6 +24,7 @@ final class SpeechQuestionAudioPlayer: NSObject, QuestionAudioPlaying {
         super.init()
         synthesizer.delegate = self
         observeInterruptions()
+        observeRouteChanges()
     }
 
     func play(_ request: QuestionAudioRequest) async throws {
@@ -78,6 +80,24 @@ final class SpeechQuestionAudioPlayer: NSObject, QuestionAudioPlaying {
             guard let rawValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
                   let type = AVAudioSession.InterruptionType(rawValue: rawValue),
                   type == .began else {
+                return
+            }
+            MainActor.assumeIsolated {
+                self?.handleInterruption()
+            }
+        }
+    }
+
+    /// イヤホンやBluetooth機器が外れたら再生を止める。スピーカーから鳴り続けないようにする。
+    private func observeRouteChanges() {
+        routeChangeObserver.token = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification,
+            object: audioSession,
+            queue: .main
+        ) { [weak self] notification in
+            guard let rawValue = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+                  let reason = AVAudioSession.RouteChangeReason(rawValue: rawValue),
+                  reason == .oldDeviceUnavailable else {
                 return
             }
             MainActor.assumeIsolated {

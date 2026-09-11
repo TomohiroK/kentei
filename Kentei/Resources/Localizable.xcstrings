@@ -1,6 +1,956 @@
 {
   "sourceLanguage": "ja",
   "strings": {
+    "interview.topicRule": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1トピック・最大3回答。合格ラインなら掘り下げ、下回った時点で終了します。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Satu topik, maksimal tiga jawaban. Jika memenuhi batas lulus, lanjut ke pertanyaan pendalaman; jika tidak, topik berakhir."
+          }
+        }
+      }
+    },
+    "interview.turn.1": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問 1 / 最大3問"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pertanyaan 1 / maksimal 3"
+          }
+        }
+      }
+    },
+    "interview.turn.2": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "掘り下げ 1 / 2"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendalaman 1 / 2"
+          }
+        }
+      }
+    },
+    "interview.turn.3": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "掘り下げ 2 / 2"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendalaman 2 / 2"
+          }
+        }
+      }
+    },
+    "interview.next": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "掘り下げの質問へ"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lanjut ke pertanyaan pendalaman"
+          }
+        }
+      }
+    },
+    "interview.followupReady": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合格ラインです。もう少し詳しく聞かせてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jawaban memenuhi batas lulus. Mari kita bahas lebih dalam."
+          }
+        }
+      }
+    },
+    "interview.topicPassed": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このトピックは合格です"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Topik ini lulus"
+          }
+        }
+      }
+    },
+    "interview.topicFailed": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このトピックは不合格です。講評を見て練習しましょう。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Topik ini belum lulus. Pelajari umpan balik, lalu berlatih lagi."
+          }
+        }
+      }
+    },
+    "interview.practiceNotice": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これはアプリ内の練習判定で、公式試験の合否ではありません。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ini hasil latihan di aplikasi, bukan hasil ujian resmi."
+          }
+        }
+      }
+    },
+    "oral.error.assessment": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点できませんでした。不合格にはしていません。回答は保存済みです。もう一度提出してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian belum berhasil. Anda tidak dinyatakan gagal. Jawaban tersimpan; silakan kirim lagi."
+          }
+        }
+      }
+    },
+    "interview.followup.b.1": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今の回答で提案した対策を、上司にどのように説明しますか。実際に話すつもりで、丁寧に伝えてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bagaimana Anda menjelaskan solusi yang baru Anda usulkan kepada atasan? Sampaikan secara sopan, seolah-olah Anda sedang berbicara langsung dengannya."
+          }
+        }
+      }
+    },
+    "interview.followup.b.2": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "それでも上司が期限を変更できないと言ったら、どうしますか。別の対応策と、その理由を説明してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika atasan tetap mengatakan bahwa tenggat waktu tidak dapat diubah, apa yang akan Anda lakukan? Jelaskan alternatif lain dan alasannya."
+          }
+        }
+      }
+    },
+    "interview.followup.a.1": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今の回答で提案した対策によって、チームの連携が改善したとどのように判断しますか。具体的な指標を挙げて説明してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bagaimana Anda menilai apakah solusi yang baru Anda usulkan benar-benar memperbaiki kerja sama tim? Jelaskan dengan indikator yang konkret."
+          }
+        }
+      }
+    },
+    "interview.followup.a.2": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その対策には費用がかかりすぎるという反論が出たら、どう答えますか。効果と費用の両面から説明してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika ada yang berpendapat bahwa solusi tersebut terlalu mahal, bagaimana Anda menanggapinya? Jelaskan dengan mempertimbangkan manfaat dan biayanya."
+          }
+        }
+      }
+    },
+    "interview.title.voice": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接：音声で回答"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wawancara: jawaban lisan"
+          }
+        }
+      }
+    },
+    "interview.title.written": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接：文字で回答"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wawancara: jawaban tertulis"
+          }
+        }
+      }
+    },
+    "interview.detail.voice": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問音声を聞いて、声で回答します"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dengarkan pertanyaan, lalu jawab dengan suara"
+          }
+        }
+      }
+    },
+    "interview.detail.written": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問音声を聞いて、文字で回答します"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dengarkan pertanyaan, lalu ketik jawaban"
+          }
+        }
+      }
+    },
+    "interview.instructions": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接官の質問を聞いて、インドネシア語で答えましょう。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dengarkan pertanyaan pewawancara, lalu jawab dalam bahasa Indonesia."
+          }
+        }
+      }
+    },
+    "interview.playQuestion": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問を聞く・もう一度聞く"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dengarkan / ulangi pertanyaan"
+          }
+        }
+      }
+    },
+    "interview.stopQuestion": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問音声を止める"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hentikan pertanyaan"
+          }
+        }
+      }
+    },
+    "interview.ready": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問を聞き終わりました。回答してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pertanyaan selesai. Silakan menjawab."
+          }
+        }
+      }
+    },
+    "interview.listenFirst": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まず質問音声を最後まで聞いてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dengarkan pertanyaan sampai selesai terlebih dahulu."
+          }
+        }
+      }
+    },
+    "interview.japaneseHint": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語のヒント"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Petunjuk bahasa Jepang"
+          }
+        }
+      }
+    },
+    "interview.writtenAnswer": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回答（インドネシア語）"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jawaban (bahasa Indonesia)"
+          }
+        }
+      }
+    },
+    "interview.saved": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回答を端末に保存しました。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jawaban disimpan di perangkat."
+          }
+        }
+      }
+    },
+    "interview.writtenPolicy": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この練習は録音しません。回答は削除するまで端末に保存します。採点は準備中で、回答を外部へ送信しません。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latihan ini tidak merekam suara. Jawaban disimpan di perangkat sampai Anda menghapusnya. Penilaian belum tersedia; jawaban tidak dikirim ke luar perangkat."
+          }
+        }
+      }
+    },
+    "oral.error.questionAudio": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "質問音声を再生できませんでした。端末のインドネシア語音声と音声出力を確認し、もう一度再生してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pertanyaan tidak dapat diputar. Periksa suara bahasa Indonesia dan keluaran audio perangkat, lalu coba lagi."
+          }
+        }
+      }
+    },
+    "interview.question.b": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "報告書の提出が遅れそうなとき、どう対応しますか。状況の伝え方と、具体的な解決策を説明してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apa yang akan Anda lakukan jika laporan Anda tidak dapat selesai tepat waktu? Jelaskan bagaimana Anda menyampaikan situasinya dan solusi konkret yang akan Anda tawarkan."
+          }
+        }
+      }
+    },
+    "interview.question.a": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在宅勤務を増やすとチームの連携が弱くなるという意見をどう考えますか。利点と課題を比較し、具体例を交えて対策を説明してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bagaimana pendapat Anda tentang anggapan bahwa bekerja dari rumah dapat melemahkan kerja sama tim? Bandingkan manfaat dan tantangannya, lalu jelaskan solusi dengan contoh konkret."
+          }
+        }
+      }
+    },
+    "oral.error.restricted": {
+      "localizations": {
+        "ja": { "stringUnit": { "state": "translated", "value": "この端末では音声認識が制限されています。端末の管理設定を確認してください。" } },
+        "id": { "stringUnit": { "state": "translated", "value": "Pengenalan ucapan dibatasi di perangkat ini. Periksa pengaturan pengelolaan perangkat." } }
+      }
+    },
+    "oral.speech": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スピーチ練習"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latihan pidato"
+          }
+        }
+      }
+    },
+    "oral.interview": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接練習"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latihan wawancara"
+          }
+        }
+      }
+    },
+    "oral.detail": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "話した内容を端末内で文字にします"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ubah ucapan menjadi teks di perangkat"
+          }
+        }
+      }
+    },
+    "oral.policy": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声は端末内だけで文字起こしします。録音は保存・提出・破棄・課題終了時に削除され、異常終了時は次回起動時に削除されます。テキストは削除操作をするまで端末に残ります。採点を有効にした後も、Claudeへ送るのは確認したテキストと設問だけです。発音・抑揚・流暢さは採点しません。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio ditranskripsikan hanya di perangkat. Rekaman dihapus saat menyimpan, mengirim, membuang, atau menutup tugas; sisa rekaman setelah aplikasi berhenti mendadak dihapus saat dibuka kembali. Teks disimpan di perangkat sampai Anda menghapusnya. Setelah penilaian diaktifkan, hanya teks yang Anda konfirmasi dan soal yang dikirim ke Claude. Pelafalan, intonasi, dan kelancaran tidak dinilai."
+          }
+        }
+      }
+    },
+    "oral.start": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "説明に同意して録音を開始"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setuju dan mulai merekam"
+          }
+        }
+      }
+    },
+    "oral.rerecord": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録り直す（旧音声を削除）"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekam ulang (hapus audio lama)"
+          }
+        }
+      }
+    },
+    "oral.stop": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止して文字起こし"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berhenti dan transkripsikan"
+          }
+        }
+      }
+    },
+    "oral.play": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録音を再生"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putar rekaman"
+          }
+        }
+      }
+    },
+    "oral.transcript": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字起こしを確認・修正"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periksa dan koreksi transkripsi"
+          }
+        }
+      }
+    },
+    "oral.confirm": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内容を確認しました"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saya sudah memeriksa isinya"
+          }
+        }
+      }
+    },
+    "oral.submit": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認したテキストを提出"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kirim teks yang dikonfirmasi"
+          }
+        }
+      }
+    },
+    "oral.save": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認したテキストを保存"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simpan teks yang dikonfirmasi"
+          }
+        }
+      }
+    },
+    "oral.saved": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキストを端末に保存しました。音声は削除済みです。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teks tersimpan di perangkat. Audio sudah dihapus."
+          }
+        }
+      }
+    },
+    "oral.pendingNotice": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録音と文字起こしを練習できます。採点は準備中のため、テキストを端末に保存します。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anda dapat berlatih merekam dan mentranskripsikan. Penilaian sedang disiapkan; teks disimpan di perangkat."
+          }
+        }
+      }
+    },
+    "oral.result": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIによる参考評価"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian referensi oleh AI"
+          }
+        }
+      }
+    },
+    "oral.delete": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声とテキストを破棄"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus audio dan teks"
+          }
+        }
+      }
+    },
+    "oral.recording": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録音中"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sedang merekam"
+          }
+        }
+      }
+    },
+    "oral.processing": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "処理中"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sedang memproses"
+          }
+        }
+      }
+    },
+    "oral.reload": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存内容を読み直す"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muat ulang data tersimpan"
+          }
+        }
+      }
+    },
+    "oral.error.permission": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイクまたは音声認識が許可されていません。設定で許可してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon atau pengenalan ucapan belum diizinkan. Izinkan melalui Pengaturan."
+          }
+        }
+      }
+    },
+    "oral.error.unavailable": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この端末ではインドネシア語の端末内認識を利用できません。音声は送信していません。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pengenalan bahasa Indonesia di perangkat tidak tersedia. Audio tidak dikirim."
+          }
+        }
+      }
+    },
+    "oral.error.recording": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録音または再生を開始できません。もう一度お試しください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekaman atau pemutaran gagal. Silakan coba lagi."
+          }
+        }
+      }
+    },
+    "oral.error.recognition": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字起こしが完了しませんでした。再生して確認するか、録り直してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transkripsi gagal. Periksa rekaman atau rekam ulang."
+          }
+        }
+      }
+    },
+    "oral.error.storage": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキストを保存・読み込みできませんでした。保存できるまで提出しません。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teks tidak dapat disimpan atau dimuat. Pengiriman menunggu penyimpanan berhasil."
+          }
+        }
+      }
+    },
+    "oral.error.cleanup": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声を削除できませんでした。再試行してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio tidak dapat dihapus. Silakan coba lagi."
+          }
+        }
+      }
+    },
+    "oral.prompt.speaking.b": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仕事で改善したいことを一つ挙げ、理由と具体的な改善案をインドネシア語で説明してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sebutkan satu hal yang ingin diperbaiki di tempat kerja. Jelaskan alasan dan usulan konkretnya dalam bahasa Indonesia."
+          }
+        }
+      }
+    },
+    "oral.prompt.interview.b": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同僚から「報告書の提出が遅れそうなとき、どう対応しますか」と質問されました。状況の伝え方と解決策をインドネシア語で答えてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekan bertanya, “Apa yang Anda lakukan jika laporan akan terlambat?” Jawab dalam bahasa Indonesia: bagaimana menjelaskan keadaan dan solusinya?"
+          }
+        }
+      }
+    },
+    "oral.prompt.speaking.a": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "都心の自家用車利用を制限すべきか、立場を明確にして、二つの根拠と想定される反論への回答をインドネシア語で述べてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haruskah penggunaan mobil pribadi dibatasi di pusat kota? Sampaikan posisi Anda, dua alasan, dan tanggapan terhadap argumen lawan dalam bahasa Indonesia."
+          }
+        }
+      }
+    },
+    "oral.prompt.interview.a": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接官から「在宅勤務を増やすと連携が弱くなるという意見をどう考えますか」と聞かれました。利点と課題を比較し、具体例を交えて対策をインドネシア語で答えてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pewawancara bertanya, “Bagaimana pendapat Anda bahwa bekerja dari rumah melemahkan kerja sama?” Bandingkan manfaat dan tantangannya, lalu usulkan solusi dengan contoh konkret dalam bahasa Indonesia."
+          }
+        }
+      }
+    },
     "action.airport.askHelp": {
       "localizations": {
         "id": {
@@ -61,6 +1011,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "時刻と待機の案内が分かる"
+          }
+        }
+      }
+    },
+    "action.bank.account": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami proses rekening"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "口座手続きの説明を理解できる"
+          }
+        }
+      }
+    },
+    "action.bank.balance": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berbicara soal dana masuk"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入金状況のやりとりができる"
+          }
+        }
+      }
+    },
+    "action.bank.transfer": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami transfer dan biayanya"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送金と手数料の説明が分かる"
           }
         }
       }
@@ -129,6 +1127,102 @@
         }
       }
     },
+    "action.delivery.receipt": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami penerimaan oleh orang lain"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代理受取の説明が分かる"
+          }
+        }
+      }
+    },
+    "action.delivery.redelivery": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami info kirim ulang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再配達の案内を理解できる"
+          }
+        }
+      }
+    },
+    "action.delivery.tracking": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berbicara soal nomor resi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追跡番号のやりとりができる"
+          }
+        }
+      }
+    },
+    "action.government.document": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami proses awal dokumen"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類の事前手続きが分かる"
+          }
+        }
+      }
+    },
+    "action.government.queue": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memastikan jam antrean"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受付時間を確認できる"
+          }
+        }
+      }
+    },
+    "action.government.visa": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami loket urusan visa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビザ手続きの窓口が分かる"
+          }
+        }
+      }
+    },
     "action.grab.destination": {
       "localizations": {
         "id": {
@@ -193,6 +1287,246 @@
         }
       }
     },
+    "action.hospital.medication": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami instruksi obat"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "薬の指示を理解できる"
+          }
+        }
+      }
+    },
+    "action.hospital.reception": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami arahan pendaftaran"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受付の案内を理解できる"
+          }
+        }
+      }
+    },
+    "action.hospital.symptom": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menjawab pertanyaan tentang gejala"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "症状の質問に答えられる"
+          }
+        }
+      }
+    },
+    "action.housing.contract": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami perpanjangan kontrak"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "契約更新の条件が分かる"
+          }
+        }
+      }
+    },
+    "action.housing.rent": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami ketentuan pembayaran sewa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "家賃の支払い条件が分かる"
+          }
+        }
+      }
+    },
+    "action.housing.repair": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meminta perbaikan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修理を依頼できる"
+          }
+        }
+      }
+    },
+    "action.pharmacy.prescription": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami cara menebus resep"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "処方箋の受け取り方が分かる"
+          }
+        }
+      }
+    },
+    "action.pharmacy.sideEffect": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami penjelasan efek samping"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "副作用の説明を理解できる"
+          }
+        }
+      }
+    },
+    "action.pharmacy.usage": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami peringatan penggunaan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "服用の注意を理解できる"
+          }
+        }
+      }
+    },
+    "action.police.document": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami surat yang diperlukan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "必要な証明書が分かる"
+          }
+        }
+      }
+    },
+    "action.police.evidence": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berbicara soal bukti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "証拠についてやりとりできる"
+          }
+        }
+      }
+    },
+    "action.police.report": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami cara membuat laporan kehilangan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "紛失届の出し方が分かる"
+          }
+        }
+      }
+    },
+    "action.sim.plan": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memastikan ketentuan paket"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プランの条件を確認できる"
+          }
+        }
+      }
+    },
+    "action.sim.registration": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami syarat registrasi SIM"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SIM登録の要件が分かる"
+          }
+        }
+      }
+    },
+    "action.sim.topUp": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melakukan isi ulang kuota"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データのチャージができる"
+          }
+        }
+      }
+    },
     "action.warung.adjust": {
       "localizations": {
         "id": {
@@ -253,6 +1587,166 @@
           "stringUnit": {
             "state": "translated",
             "value": "持ち帰りやアレルギーを伝えられる"
+          }
+        }
+      }
+    },
+    "action.workplace.report": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami tenggat penyerahan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提出期限を理解できる"
+          }
+        }
+      }
+    },
+    "action.workplace.request": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menanggapi permintaan dengan pola baku"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "依頼に定型で応答できる"
+          }
+        }
+      }
+    },
+    "action.workplace.schedule": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memahami perubahan jadwal"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "予定変更を理解できる"
+          }
+        }
+      }
+    },
+    "advanced.interview.a": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接（A級）"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wawancara (tingkat A)"
+          }
+        }
+      }
+    },
+    "advanced.interview.b": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面接（B級）"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wawancara (tingkat B)"
+          }
+        }
+      }
+    },
+    "advanced.interview.detail": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "話した内容を採点し、観点ごとに講評を返します"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jawaban lisan Anda dinilai dan diberi komentar per aspek"
+          }
+        }
+      }
+    },
+    "advanced.notice.notConfigured": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いま採点は返せません。書いた文章は端末に残り、あとで採点できます"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian belum dapat diberikan sekarang. Tulisan Anda tersimpan di perangkat dan dapat dinilai nanti."
+          }
+        }
+      }
+    },
+    "advanced.reason.recording": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この発話課題は準備中です"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latihan berbicara ini sedang disiapkan"
+          }
+        }
+      }
+    },
+    "advanced.writing.detail": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書いた文章を採点し、観点ごとに講評を返します"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tulisan Anda dinilai dan diberi komentar per aspek"
+          }
+        }
+      }
+    },
+    "atlas.action.awaitsPracticalCheck": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perlu lulus uji praktik"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実戦チェックの合格が必要です"
           }
         }
       }
@@ -353,6 +1847,38 @@
         }
       }
     },
+    "atlas.bank": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bank"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "銀行"
+          }
+        }
+      }
+    },
+    "atlas.bank.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekening, transfer, biaya"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "口座・送金・手数料"
+          }
+        }
+      }
+    },
     "atlas.convenience": {
       "localizations": {
         "id": {
@@ -385,6 +1911,38 @@
         }
       }
     },
+    "atlas.delivery": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pengiriman"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配送"
+          }
+        }
+      }
+    },
+    "atlas.delivery.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penerimaan, kirim ulang, pelacakan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受取・再配達・追跡"
+          }
+        }
+      }
+    },
     "atlas.dueForReview": {
       "localizations": {
         "id": {
@@ -397,6 +1955,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "復習の時期になった問題"
+          }
+        }
+      }
+    },
+    "atlas.government": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Administrasi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行政"
+          }
+        }
+      }
+    },
+    "atlas.government.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visa, dokumen, loket"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビザ・書類・窓口"
           }
         }
       }
@@ -481,6 +2071,70 @@
         }
       }
     },
+    "atlas.hospital": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rumah sakit"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "病院"
+          }
+        }
+      }
+    },
+    "atlas.hospital.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendaftaran, gejala, penjelasan obat"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受付・症状・薬の説明"
+          }
+        }
+      }
+    },
+    "atlas.housing": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempat tinggal"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "家"
+          }
+        }
+      }
+    },
+    "atlas.housing.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sewa, perbaikan, kontrak"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "家賃・修理・契約"
+          }
+        }
+      }
+    },
     "atlas.metric.actions": {
       "localizations": {
         "id": {
@@ -513,6 +2167,198 @@
         }
       }
     },
+    "atlas.pharmacy": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apotek"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "薬局"
+          }
+        }
+      }
+    },
+    "atlas.pharmacy.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resep, aturan pakai, efek samping"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "処方箋・用法・副作用"
+          }
+        }
+      }
+    },
+    "atlas.police": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kepolisian"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "警察"
+          }
+        }
+      }
+    },
+    "atlas.police.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laporan kehilangan, surat keterangan, bukti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "紛失届・証明書・証拠"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uji praktik"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実戦チェック"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uji lima soal untuk memastikan Anda bisa memakainya di situasi nyata. Lulus jika benar 80%. Kelulusan membuka aksi yang memerlukan uji praktik."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この場面を実際に使えるかを5問で確かめます。8割正解で合格です。合格すると、実戦が必要な行動が解放されます。"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.failed": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belum lulus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不合格"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.notTaken": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belum diikuti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未実施"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.passed": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lulus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合格"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.retry": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulangi uji praktik"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "もう一度受ける"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.score": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hasil terakhir"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直近の結果"
+          }
+        }
+      }
+    },
+    "atlas.practicalCheck.start": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ikuti uji praktik"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実戦チェックを受ける"
+          }
+        }
+      }
+    },
     "atlas.scenes": {
       "localizations": {
         "id": {
@@ -525,6 +2371,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "生活シーン"
+          }
+        }
+      }
+    },
+    "atlas.simCard": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SIM dan komunikasi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SIM・通信"
+          }
+        }
+      }
+    },
+    "atlas.simCard.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrasi, isi ulang, paket"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登録・チャージ・プラン"
           }
         }
       }
@@ -637,6 +2515,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "注文・辛さ・おすすめ"
+          }
+        }
+      }
+    },
+    "atlas.workplace": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempat kerja"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "職場"
+          }
+        }
+      }
+    },
+    "atlas.workplace.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laporan, jadwal, permintaan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "報告・予定・依頼"
+          }
+        }
+      }
+    },
+    "common.cancel": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batal"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
           }
         }
       }
@@ -1041,6 +2967,38 @@
         }
       }
     },
+    "learn.advanced": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "B級・A級に挑む"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tantang tingkat B dan A"
+          }
+        }
+      }
+    },
+    "learn.advanced.detail": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "B級・A級は選択式ではなく、作文と面接で力をはかります。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tingkat B dan A tidak memakai soal pilihan, melainkan menulis dan wawancara."
+          }
+        }
+      }
+    },
     "learn.byLevel": {
       "localizations": {
         "id": {
@@ -1062,13 +3020,13 @@
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pilih materi tingkat E atau D"
+            "value": "Soal diambil dari materi tingkat yang dipilih"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "E級・D級の教材を選びます"
+            "value": "選んだ級の教材から出題します"
           }
         }
       }
@@ -1718,13 +3676,13 @@
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sesi pertama dimulai dari tingkat E. Anda dapat naik tingkat setelah terbiasa."
+            "value": "Pembelajaran dimulai dari tingkat yang Anda pilih. Naik tingkat setelah terbiasa."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "最初の学習はE級から始まります。慣れてきたら上の級へ進みます。"
+            "value": "選んだ級の教材から始まります。慣れてきたら上の級へ進みます。"
           }
         }
       }
@@ -1894,13 +3852,13 @@
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "TINGKAT SAAT INI"
+            "value": "Kemajuan penguasaan"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "現在のレベル"
+            "value": "習得の進み"
           }
         }
       }
@@ -1942,13 +3900,13 @@
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dasar tingkat E"
+            "value": "Seluruh pembelajaran"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "E級 基礎"
+            "value": "学習全体"
           }
         }
       }
@@ -2237,6 +4195,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "空港で荷物を預ける"
+          }
+        }
+      }
+    },
+    "rubric.criterion.argument": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "論の展開"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pengembangan argumen"
+          }
+        }
+      }
+    },
+    "rubric.criterion.coherence": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Struktur"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "構成"
+          }
+        }
+      }
+    },
+    "rubric.criterion.grammar": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tata bahasa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文法"
+          }
+        }
+      }
+    },
+    "rubric.criterion.register": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文体"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ragam bahasa"
+          }
+        }
+      }
+    },
+    "rubric.criterion.task": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kesesuaian dengan tugas"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題への対応"
+          }
+        }
+      }
+    },
+    "rubric.criterion.vocabulary": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kosakata"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語彙"
           }
         }
       }
@@ -2673,6 +4727,150 @@
         }
       }
     },
+    "settings.assessment": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server penilaian"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点サーバー"
+          }
+        }
+      }
+    },
+    "settings.assessment.configured": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dapat digunakan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用できます"
+          }
+        }
+      }
+    },
+    "settings.assessment.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status koneksi untuk penilaian menulis. Tidak perlu diatur; ini sementara sampai fitur keanggotaan tersedia."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作文の採点に使う接続の状態です。設定は不要で、会員機能ができるまでの暫定です。"
+          }
+        }
+      }
+    },
+    "settings.assessment.notConfigured": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belum dapat digunakan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用できません"
+          }
+        }
+      }
+    },
+    "settings.assessment.source": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取得元"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sumber"
+          }
+        }
+      }
+    },
+    "settings.assessment.source.bundled": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリに同梱"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disertakan dalam aplikasi"
+          }
+        }
+      }
+    },
+    "settings.assessment.source.device": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この端末に保存"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tersimpan di perangkat ini"
+          }
+        }
+      }
+    },
+    "settings.assessment.source.none": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "なし"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada"
+          }
+        }
+      }
+    },
+    "settings.assessment.state": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian"
+          }
+        }
+      }
+    },
     "settings.autoplay": {
       "localizations": {
         "id": {
@@ -2817,6 +5015,70 @@
         }
       }
     },
+    "settings.deleteData": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus data belajar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習データを削除"
+          }
+        }
+      }
+    },
+    "settings.deleteData.confirm": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除する"
+          }
+        }
+      }
+    },
+    "settings.deleteData.message": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jawaban, status penguasaan, jawaban yang belum terkirim, dan pengaturan awal akan dihapus. Tindakan ini tidak dapat dibatalkan."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回答、習得状態、未送信の回答、初回設定を削除します。この操作は取り消せません。"
+          }
+        }
+      }
+    },
+    "settings.deleteData.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus data belajar?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習データを削除しますか？"
+          }
+        }
+      }
+    },
     "settings.downloads": {
       "localizations": {
         "id": {
@@ -2945,6 +5207,22 @@
         }
       }
     },
+    "settings.privacy.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catatan belajar (jawaban, status penguasaan, pengaturan) hanya disimpan di perangkat ini. Tidak ada pengiriman ke luar. Tidak ada perekaman suara."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習の記録（回答、習得状態、設定）はこの端末の中だけに保存しています。外部への送信は行っていません。録音は行いません。"
+          }
+        }
+      }
+    },
     "settings.reducedEffects": {
       "localizations": {
         "id": {
@@ -2973,6 +5251,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "音声速度"
+          }
+        }
+      }
+    },
+    "settings.sync": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sinkronisasi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同期"
+          }
+        }
+      }
+    },
+    "settings.sync.connection": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koneksi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接続"
+          }
+        }
+      }
+    },
+    "settings.sync.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belajar berjalan penuh dengan materi di perangkat, jadi tetap bisa dilakukan tanpa koneksi. Jawaban disimpan di perangkat dan akan disinkronkan tanpa pengiriman ganda setelah tujuan pengiriman ditentukan."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習は端末内の教材で完結するため、オフラインでも進められます。回答は端末に保存され、送信先が決まり次第、同じ回答を二度送らない仕組みで同期します。"
+          }
+        }
+      }
+    },
+    "settings.sync.offline": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Luring"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフライン"
+          }
+        }
+      }
+    },
+    "settings.sync.online": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daring"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オンライン"
+          }
+        }
+      }
+    },
+    "settings.sync.pending": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jawaban belum terkirim"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未送信の回答"
           }
         }
       }
@@ -3069,6 +5443,806 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定"
+          }
+        }
+      }
+    },
+    "writing.answerLanguage": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インドネシア語で書いてください"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tulislah dalam bahasa Indonesia"
+          }
+        }
+      }
+    },
+    "writing.byCriterion": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian per aspek"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "観点ごとの評価"
+          }
+        }
+      }
+    },
+    "writing.characterCount": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumlah karakter"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字数"
+          }
+        }
+      }
+    },
+    "writing.doneEditing": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selesai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        }
+      }
+    },
+    "writing.editor.label": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kolom menulis (bahasa Indonesia)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作文の入力欄（インドネシア語）"
+          }
+        }
+      }
+    },
+    "writing.error.generic.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periksa kembali isinya lalu coba lagi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内容を見直して、もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "writing.error.invalid": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi ini tidak dapat dinilai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この内容は採点できません"
+          }
+        }
+      }
+    },
+    "writing.error.notConfigured": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian tidak tersedia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点を利用できません"
+          }
+        }
+      }
+    },
+    "writing.error.notConfigured.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian belum dapat diberikan sekarang. Tulisan Anda tersimpan di perangkat dan dapat dinilai nanti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いまは採点を返せません。書いた文章は端末に残っているので、あとで採点できます。"
+          }
+        }
+      }
+    },
+    "writing.error.recording": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekaman tidak dapat dinilai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録音は採点できません"
+          }
+        }
+      }
+    },
+    "writing.error.rubric": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kriteria penilaian tidak cocok"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点基準が一致しません"
+          }
+        }
+      }
+    },
+    "writing.error.temporary": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penilaian tidak terkirim"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点に届きませんでした"
+          }
+        }
+      }
+    },
+    "writing.error.temporary.detail": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periksa koneksi lalu kirim ulang. Kiriman yang gagal tetap disimpan di perangkat."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通信を確認して、もう一度送ってください。送れなかった提出は端末に保持しています。"
+          }
+        }
+      }
+    },
+    "writing.model": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模範回答"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contoh jawaban"
+          }
+        }
+      }
+    },
+    "writing.model.caption": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同じ課題に対する答案の一例です。写すためではなく、観点ごとに何が違うかを見るために使ってください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salah satu contoh jawaban untuk tugas yang sama. Gunakan untuk melihat perbedaannya per aspek, bukan untuk disalin."
+          }
+        }
+      }
+    },
+    "writing.model.dailyLife": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap pagi saya bangun pukul setengah enam, lalu sarapan di rumah. Setelah itu saya naik KRL ke kantor karena jalanan sering macet pada jam sibuk. Pada siang hari saya makan di warung dekat kantor bersama rekan kerja. Sepulang kerja saya berbelanja sayur di pasar, kemudian memasak untuk makan malam."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap pagi saya bangun pukul setengah enam, lalu sarapan di rumah. Setelah itu saya naik KRL ke kantor karena jalanan sering macet pada jam sibuk. Pada siang hari saya makan di warung dekat kantor bersama rekan kerja. Sepulang kerja saya berbelanja sayur di pasar, kemudian memasak untuk makan malam."
+          }
+        }
+      }
+    },
+    "writing.model.dailyLife.notes": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題への対応: 朝・昼・夕方・夜と一日を通して並べ、抜けがありません。\n文法: naik, makan, berbelanja, memasak を場面ごとに正しく使っています。\n語彙: sarapan（朝食をとる）のように、行為ごとに専用の語を選んでいます。\n構成: lalu / setelah itu / kemudian で順序が追えます。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi: menyusun satu hari penuh dari pagi hingga malam tanpa bagian yang hilang.\nTata bahasa: naik, makan, berbelanja, memasak dipakai sesuai konteksnya.\nKosakata: memilih kata khusus untuk tiap kegiatan, misalnya sarapan.\nKeruntutan: urutan terlihat lewat lalu / setelah itu / kemudian."
+          }
+        }
+      }
+    },
+    "writing.model.notes": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この答案が評価される理由"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alasan jawaban ini dinilai baik"
+          }
+        }
+      }
+    },
+    "writing.model.policyDebate": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saya tidak setuju dengan pembatasan kendaraan pribadi di pusat Jakarta selama angkutan umum belum memadai. Alasan pertama, banyak pekerja tinggal di kawasan yang belum terjangkau KRL maupun TransJakarta, sehingga pembatasan akan memindahkan beban kepada mereka yang paling sulit menanggungnya. Alasan kedua, kebijakan serupa di kota lain menunjukkan bahwa pembatasan tanpa penambahan armada hanya menggeser kemacetan ke jalan di sekitarnya. Pendukung kebijakan ini menilai bahwa pembatasan justru mendorong orang berpindah ke angkutan umum. Pandangan itu masuk akal apabila layanannya sudah tersedia. Karena itu, menurut saya urutannya perlu dibalik: perbaiki dahulu jangkauan angkutan umum, baru terapkan pembatasan secara bertahap."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saya tidak setuju dengan pembatasan kendaraan pribadi di pusat Jakarta selama angkutan umum belum memadai. Alasan pertama, banyak pekerja tinggal di kawasan yang belum terjangkau KRL maupun TransJakarta, sehingga pembatasan akan memindahkan beban kepada mereka yang paling sulit menanggungnya. Alasan kedua, kebijakan serupa di kota lain menunjukkan bahwa pembatasan tanpa penambahan armada hanya menggeser kemacetan ke jalan di sekitarnya. Pendukung kebijakan ini menilai bahwa pembatasan justru mendorong orang berpindah ke angkutan umum. Pandangan itu masuk akal apabila layanannya sudah tersedia. Karena itu, menurut saya urutannya perlu dibalik: perbaiki dahulu jangkauan angkutan umum, baru terapkan pembatasan secara bertahap."
+          }
+        }
+      }
+    },
+    "writing.model.policyDebate.notes": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題への対応: 立場を最初に示し、理由を二つ挙げ、反対の立場にも触れています。\n論の展開: 根拠が「順序を逆にすべき」という結論に結びついています。反論を認めたうえで自説を保っている点が要です。\n文法: sehingga / apabila / karena itu で複文を組み立てています。\n語彙: jangkauan, armada, bertahap と議論に必要な語を使っています。\n文体: 書き言葉で一貫し、話し言葉が混ざっていません。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi: menyatakan posisi di awal, memberi dua alasan, dan menyebut pihak yang berseberangan.\nArgumen: alasan-alasannya bermuara pada satu simpulan, yaitu urutan kebijakan perlu dibalik. Keberatan diakui lebih dahulu, baru posisinya dipertahankan.\nTata bahasa: kalimat majemuk dibangun dengan sehingga / apabila / karena itu.\nKosakata: memakai kata yang diperlukan dalam argumen seperti jangkauan, armada, bertahap.\nRagam: konsisten memakai bahasa tulis."
+          }
+        }
+      }
+    },
+    "writing.model.socialChange": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembayaran digital menyebar cepat di Indonesia karena tiga hal yang terjadi hampir bersamaan: kepemilikan telepon pintar meluas, bank sentral menyeragamkan standar kode QR, dan pembatasan pada masa pandemi mendorong orang menghindari uang tunai. Bagi masyarakat, perubahan ini memangkas waktu transaksi dan mengurangi persoalan uang kembalian. Bagi pedagang kecil, dampaknya bercabang. Di satu sisi, catatan penjualan menjadi rapi sehingga lebih mudah mengajukan pinjaman. Di sisi lain, pedagang berusia lanjut atau yang berada di daerah dengan jaringan lemah justru kehilangan pembeli. Akibatnya, kemudahan itu belum terbagi merata."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembayaran digital menyebar cepat di Indonesia karena tiga hal yang terjadi hampir bersamaan: kepemilikan telepon pintar meluas, bank sentral menyeragamkan standar kode QR, dan pembatasan pada masa pandemi mendorong orang menghindari uang tunai. Bagi masyarakat, perubahan ini memangkas waktu transaksi dan mengurangi persoalan uang kembalian. Bagi pedagang kecil, dampaknya bercabang. Di satu sisi, catatan penjualan menjadi rapi sehingga lebih mudah mengajukan pinjaman. Di sisi lain, pedagang berusia lanjut atau yang berada di daerah dengan jaringan lemah justru kehilangan pembeli. Akibatnya, kemudahan itu belum terbagi merata."
+          }
+        }
+      }
+    },
+    "writing.model.socialChange.notes": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題への対応: 広がった理由と影響の両方に答え、良い影響と困った影響を分けています。\n論の展開: 原因を三つに整理し、影響を「利用者」と「小規模な商店」に分けて示しています。\n文法: sehingga / akibatnya で因果を示し、受動も自然です。\n語彙: menyeragamkan, bercabang, merata と抽象度の高い語を使っています。\n文体: 説明文としての書き言葉で通しています。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi: menjawab sebab sekaligus dampak, serta memisahkan dampak baik dan dampak yang menyulitkan.\nArgumen: sebab disusun menjadi tiga hal, lalu dampaknya dipisah antara masyarakat dan pedagang kecil.\nTata bahasa: hubungan sebab-akibat ditandai sehingga / akibatnya; bentuk pasif terasa wajar.\nKosakata: memakai kata abstrak seperti menyeragamkan, bercabang, merata.\nRagam: konsisten sebagai tulisan pemaparan."
+          }
+        }
+      }
+    },
+    "writing.model.twoSources": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kedua pendapat sebenarnya berangkat dari ukuran keberhasilan yang berbeda. Pendapat 1 menilai kerja dari rumah dari sisi biaya dan waktu, baik bagi pekerja maupun bagi perusahaan. Pendapat 2 menilainya dari sisi pewarisan cara kerja, yaitu bagaimana karyawan baru menyerap kebiasaan yang tidak tertulis. Karena ukurannya berbeda, keduanya dapat benar sekaligus. Menurut saya persoalannya bukan memilih salah satu, melainkan menentukan siapa yang bekerja dari rumah dan pada tahap mana. Karyawan yang sudah menguasai pekerjaannya dapat bekerja jarak jauh tanpa kehilangan mutu, sedangkan karyawan baru sebaiknya berada di kantor pada tahun pertama. Dengan begitu, penghematan yang disebut Pendapat 1 tetap diperoleh tanpa mengabaikan kekhawatiran Pendapat 2."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kedua pendapat sebenarnya berangkat dari ukuran keberhasilan yang berbeda. Pendapat 1 menilai kerja dari rumah dari sisi biaya dan waktu, baik bagi pekerja maupun bagi perusahaan. Pendapat 2 menilainya dari sisi pewarisan cara kerja, yaitu bagaimana karyawan baru menyerap kebiasaan yang tidak tertulis. Karena ukurannya berbeda, keduanya dapat benar sekaligus. Menurut saya persoalannya bukan memilih salah satu, melainkan menentukan siapa yang bekerja dari rumah dan pada tahap mana. Karyawan yang sudah menguasai pekerjaannya dapat bekerja jarak jauh tanpa kehilangan mutu, sedangkan karyawan baru sebaiknya berada di kantor pada tahun pertama. Dengan begitu, penghematan yang disebut Pendapat 1 tetap diperoleh tanpa mengabaikan kekhawatiran Pendapat 2."
+          }
+        }
+      }
+    },
+    "writing.model.twoSources.notes": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題への対応: 二つの意見を要約し、違いを整理してから自分の考えに入っています。\n論の展開: 「両者は評価の物差しが違うので同時に成り立つ」という切り口を示し、誰がいつ在宅で働くかという条件付きの結論に導いています。どちらが正しいかを選ぶだけの答案との差はここです。\n文法: sedangkan / melainkan / dengan begitu を正しく使い分けています。\n語彙: ukuran keberhasilan, pewarisan, menyerap と抽象的な言い回しを使っています。\n文体: 引用の際に Pendapat 1 / Pendapat 2 と出所を明示しています。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi: meringkas kedua pendapat, menguraikan perbedaannya, baru masuk ke pendapat sendiri.\nArgumen: menunjukkan bahwa keduanya memakai ukuran keberhasilan yang berbeda sehingga dapat sama-sama benar, lalu menutup dengan simpulan bersyarat tentang siapa dan kapan. Di sinilah bedanya dengan jawaban yang sekadar memilih salah satu.\nTata bahasa: sedangkan / melainkan / dengan begitu dipakai secara tepat.\nKosakata: memakai ungkapan abstrak seperti ukuran keberhasilan, pewarisan, menyerap.\nRagam: sumber kutipan disebut jelas sebagai Pendapat 1 / Pendapat 2."
+          }
+        }
+      }
+    },
+    "writing.model.workReport": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saya bekerja di bagian pembelian. Tugas utama saya adalah memesan bahan dari pemasok dan memastikan barang datang tepat waktu. Setiap minggu saya membandingkan harga dari beberapa pemasok, lalu mengusulkan yang paling sesuai kepada atasan. Kalau pengiriman terlambat, saya segera menghubungi pemasok dan memberi tahu bagian produksi agar jadwal dapat disesuaikan."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saya bekerja di bagian pembelian. Tugas utama saya adalah memesan bahan dari pemasok dan memastikan barang datang tepat waktu. Setiap minggu saya membandingkan harga dari beberapa pemasok, lalu mengusulkan yang paling sesuai kepada atasan. Kalau pengiriman terlambat, saya segera menghubungi pemasok dan memberi tahu bagian produksi agar jadwal dapat disesuaikan."
+          }
+        }
+      }
+    },
+    "writing.model.workReport.notes": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題への対応: 所属・主な仕事・困ったときの動き方まで説明しています。\n文法: memesan, memastikan, membandingkan と me- 動詞を正しく作れています。\n語彙: pemasok, pengiriman, jadwal と仕事の語を使い分けています。\n構成: setiap minggu / kalau で場面を切り替え、説明が整理されています。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi: menjelaskan bagian, tugas utama, sampai tindakan ketika ada masalah.\nTata bahasa: bentuk me- seperti memesan, memastikan, membandingkan sudah tepat.\nKosakata: memakai istilah kerja seperti pemasok, pengiriman, jadwal.\nKeruntutan: setiap minggu / kalau memisahkan situasi dengan rapi."
+          }
+        }
+      }
+    },
+    "writing.notPassed": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belum lulus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "もう少し"
+          }
+        }
+      }
+    },
+    "writing.overall": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komentar keseluruhan"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全体の講評"
+          }
+        }
+      }
+    },
+    "writing.passed": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lulus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合格"
+          }
+        }
+      }
+    },
+    "writing.prompt": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tugas"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "課題"
+          }
+        }
+      }
+    },
+    "writing.retry": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kirim ulang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "もう一度送る"
+          }
+        }
+      }
+    },
+    "writing.submit": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minta dinilai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点してもらう"
+          }
+        }
+      }
+    },
+    "writing.submitting": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sedang dinilai…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "採点しています…"
+          }
+        }
+      }
+    },
+    "writing.task.dailyLife": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ceritakan satu hari Anda di Indonesia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インドネシアでの一日を紹介してください"
+          }
+        }
+      }
+    },
+    "writing.task.dailyLife.hint": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuliskan kegiatan dari pagi hingga malam secara berurutan. Gunakan kata penghubung seperti lalu, setelah itu, karena."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "朝から夜までの行動を、順序が分かるように書いてください。接続表現（lalu, setelah itu, karena）を使うと読みやすくなります。"
+          }
+        }
+      }
+    },
+    "writing.task.policyDebate": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ジャカルタの中心部で自家用車の乗り入れを制限する案について、賛成か反対かを述べ、理由を二つ以上挙げて論じてください。反対の立場から出そうな意見にも触れてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kemukakan pendapat Anda—setuju atau tidak setuju—tentang pembatasan kendaraan pribadi di pusat Jakarta, disertai minimal dua alasan. Sebutkan juga keberatan yang mungkin muncul dari pihak yang berseberangan."
+          }
+        }
+      }
+    },
+    "writing.task.policyDebate.hint": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立場を先に示してから根拠を並べると読み手が追えます。根拠は「渋滞が減る」で止めず、誰にどう影響するかまで書きます。反対意見に触れたうえで、それでも自分の立場を採る理由を述べると論が強くなります。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nyatakan posisi Anda di awal, lalu susun alasannya. Jangan berhenti pada “kemacetan berkurang”; jelaskan siapa yang terdampak dan bagaimana. Menyebut keberatan pihak lain lalu menjawabnya akan memperkuat argumen."
+          }
+        }
+      }
+    },
+    "writing.task.socialChange": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インドネシアで電子決済（QRIS など）が急速に広がりました。広がった理由と、それが人々の生活や小規模な商店にもたらした影響を説明してください。良い影響と困った影響の両方に触れてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembayaran digital (misalnya QRIS) menyebar dengan cepat di Indonesia. Jelaskan sebab penyebarannya serta dampaknya bagi kehidupan masyarakat dan pedagang kecil. Sebutkan dampak positif maupun dampak yang menyulitkan."
+          }
+        }
+      }
+    },
+    "writing.task.socialChange.hint": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原因と結果を取り違えないように、何が先に起きたかを整理してから書きます。「便利になった」だけでなく、誰にとって便利で、誰が取り残されるのかまで踏み込みます。因果を示す表現（karena, sehingga, akibatnya）を使い分けてください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pisahkan sebab dan akibat dengan jelas sebelum menulis. Jangan berhenti pada “menjadi praktis”; jelaskan bagi siapa praktis dan siapa yang tertinggal. Gunakan penanda sebab-akibat (karena, sehingga, akibatnya) secara tepat."
+          }
+        }
+      }
+    },
+    "writing.task.twoSources": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次の二つの意見（インドネシア語）を読み、両者の主張の違いを整理したうえで、あなた自身の考えをインドネシア語で述べてください。\n\n【Pendapat 1】Bekerja dari rumah menghapus beban perjalanan harian dan memungkinkan seseorang tinggal di daerah sambil bekerja untuk perusahaan di kota. Bagi perusahaan, biaya sewa kantor pun dapat ditekan.\n\n【Pendapat 2】Bekerja dari rumah menyulitkan pembinaan karyawan baru. Cara kerja dipelajari sambil berada di ruang yang sama, dan hal semacam itu sulit tersampaikan lewat layar."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bacalah kedua pendapat berikut, uraikan perbedaan inti keduanya, lalu kemukakan pendapat Anda sendiri.\n\n[Pendapat 1] Bekerja dari rumah menghapus beban perjalanan harian dan memungkinkan seseorang tinggal di daerah sambil bekerja untuk perusahaan di kota. Bagi perusahaan, biaya sewa kantor pun dapat ditekan.\n\n[Pendapat 2] Bekerja dari rumah menyulitkan pembinaan karyawan baru. Cara kerja dipelajari sambil berada di ruang yang sama, dan hal semacam itu sulit tersampaikan lewat layar."
+          }
+        }
+      }
+    },
+    "writing.task.twoSources.hint": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "二つの意見を要約してから自分の考えに入ります。どちらが正しいかを選ぶだけでなく、両者が何を前提にしているかの違いを示せると評価が上がります。引用するときは Pendapat 1 menyatakan bahwa... のように出所を示してください。"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ringkas kedua pendapat sebelum masuk ke pendapat Anda. Selain memilih salah satu, tunjukkan perbedaan asumsi yang mendasari keduanya. Saat mengutip, sebutkan sumbernya, misalnya Pendapat 1 menyatakan bahwa..."
+          }
+        }
+      }
+    },
+    "writing.task.workReport": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jelaskan pekerjaan Anda kepada rekan kerja"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仕事の内容を同僚に説明してください"
+          }
+        }
+      }
+    },
+    "writing.task.workReport.hint": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuliskan tanggung jawab, prosedur, dan tenggat waktu Anda. Gunakan bentuk pasif (di-) dan imbuhan (me-, -kan)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "担当していること、手順、締め切りを書いてください。受動（di-）や接辞（me-, -kan）を使う場面です。"
+          }
+        }
+      }
+    },
+    "writing.title": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menulis"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作文"
+          }
+        }
+      }
+    },
+    "writing.title.dailyLife": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一日の紹介"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memperkenalkan satu hari"
+          }
+        }
+      }
+    },
+    "writing.title.policyDebate": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "意見文｜都心の車両規制"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opini｜pembatasan kendaraan"
+          }
+        }
+      }
+    },
+    "writing.title.socialChange": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "説明文｜電子決済の広がり"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uraian｜penyebaran pembayaran digital"
+          }
+        }
+      }
+    },
+    "writing.title.twoSources": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料比較｜在宅勤務"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandingkan sumber｜kerja dari rumah"
+          }
+        }
+      }
+    },
+    "writing.title.workReport": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仕事の説明"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menjelaskan pekerjaan"
+          }
+        }
+      }
+    },
+    "writing.writeAgain": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tulis ulang"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き直す"
           }
         }
       }

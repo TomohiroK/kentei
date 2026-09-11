@@ -5,3 +5,15 @@ xcuserdata/
 *.xccheckout
 *.xcscmblueprint
 
+
+# 中継サーバー
+server/node_modules/
+server/.vercel/
+server/dist/
+.env
+.env.*
+!.env.example
+
+# 採点サーバーの呼び出しトークン（会員機能ができるまでの暫定）
+Secrets/*
+!Secrets/README.md

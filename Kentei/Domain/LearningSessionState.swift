@@ -138,8 +138,8 @@ struct LearningContentPack: Equatable, Sendable {
     var deliverableQuestions: [LearningQuestion] {
         questions.filter { question in
             question.status.isDeliverable
-                && question.level.isAvailableInMVP
-                && question.questionType.isDeliverableInMVP
+                && question.level.isProvided
+                && question.questionType.isDeliverable
         }
     }
 
@@ -169,6 +169,21 @@ enum LearningSessionOrigin: Equatable, Sendable {
     case level(CertificationLevel)
     case review
     case scenario(ScenarioID)
+    /// 実戦チェック。カテゴリの行動を実際に使えるかを確かめる小テスト。
+    case practicalCheck(ScenarioID)
+
+    /// 1セッションの問題数。実戦チェックだけ短くする。
+    var sessionQuestionCount: Int {
+        switch self {
+        case .practicalCheck: PracticalCheckPolicy.current.questionCount
+        default: LearningSessionPlanner.defaultQuestionCount
+        }
+    }
+
+    var practicalCheckScenarioID: ScenarioID? {
+        guard case let .practicalCheck(scenarioID) = self else { return nil }
+        return scenarioID
+    }
 }
 
 /// 出題優先度の係数。運用設定として持ち、コードへ埋め込まない。
@@ -242,6 +257,11 @@ enum LearningSessionPlanner {
             return Array(ranked.prefix(questionCount))
         }
 
+        // 実戦チェックはそのカテゴリの力を測るため、他カテゴリの教材で補わない。
+        if case .practicalCheck = origin {
+            return ranked
+        }
+
         // 入口ごとの候補が足りない場合も、同じ教材プールから補って20問を組む。
         let selectedIDs = Set(ranked.map(\.id))
         let remaining = pack.deliverableQuestions.filter { selectedIDs.contains($0.id) == false }
@@ -267,7 +287,7 @@ enum LearningSessionPlanner {
                 default: false
                 }
             }
-        case let .scenario(scenarioID):
+        case let .scenario(scenarioID), let .practicalCheck(scenarioID):
             pack.deliverableQuestions.filter { $0.scenarioIDs.contains(scenarioID) }
         }
     }
@@ -330,8 +350,12 @@ enum LearningSessionPlanner {
         origin: LearningSessionOrigin,
         weights: SelectionWeights
     ) -> Double {
-        guard case let .scenario(scenarioID) = origin else { return 0 }
-        return question.scenarioIDs.contains(scenarioID) ? weights.scenarioNeed : 0
+        switch origin {
+        case let .scenario(scenarioID), let .practicalCheck(scenarioID):
+            return question.scenarioIDs.contains(scenarioID) ? weights.scenarioNeed : 0
+        default:
+            return 0
+        }
     }
 }
 

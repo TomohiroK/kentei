@@ -13,12 +13,32 @@ final class ContentCatalogTests: XCTestCase {
         XCTAssertTrue(issues.isEmpty, "公開する教材は自動検査を通る: \(issues)")
     }
 
-    func testPackProvidesBothMVPLevels() {
+    func testPackProvidesEveryProvidedLevel() {
         let levels = Set(pack.deliverableQuestions.map(\.level))
 
-        XCTAssertEqual(levels, [.e, .d], "MVPはE級とD級を提供する")
+        XCTAssertEqual(levels, [.e, .d, .c], "提供中の級すべてに教材がある")
         XCTAssertGreaterThanOrEqual(pack.deliverableQuestions(at: .e).count, 20)
         XCTAssertGreaterThanOrEqual(pack.deliverableQuestions(at: .d).count, 20)
+        XCTAssertGreaterThanOrEqual(pack.deliverableQuestions(at: .c).count, 20)
+    }
+
+    func testCLevelCoversLifeProcedureScenarios() {
+        let cQuestions = pack.deliverableQuestions(at: .c)
+        let scenarios = Set(cQuestions.flatMap(\.scenarioIDs))
+
+        let expected: Set<ScenarioID> = [
+            .hospital, .pharmacy, .bank, .simCard, .delivery,
+            .housing, .police, .government, .workplace
+        ]
+        XCTAssertTrue(expected.isSubset(of: scenarios), "C級は生活手続きの9カテゴリを扱う")
+    }
+
+    func testCLevelUsesGrammarAndResponseFormats() {
+        let types = Set(pack.deliverableQuestions(at: .c).map(\.questionType))
+
+        XCTAssertTrue(types.contains(.grammarFunctionChoice), "接辞・受動を問う形式を含む")
+        XCTAssertTrue(types.contains(.responseChoice), "定型応答を含む")
+        XCTAssertTrue(types.contains(.contentMatch))
     }
 
     func testDLevelUsesContentMatchAndActionDecision() {
@@ -39,9 +59,10 @@ final class ContentCatalogTests: XCTestCase {
         }
     }
 
-    func testUnavailableLevelsAreNotExposed() {
-        XCTAssertEqual(CertificationLevel.availableLevels, [.e, .d])
-        XCTAssertFalse(CertificationLevel.c.isAvailableInMVP, "C級以上はUIへ露出しない")
+    func testUnprovidedLevelsAreNotExposed() {
+        XCTAssertEqual(CertificationLevel.availableLevels, [.e, .d, .c])
+        XCTAssertFalse(CertificationLevel.b.isProvided, "AI評価が要るB級以上は提供しない")
+        XCTAssertFalse(CertificationLevel.a.isProvided)
     }
 
     // MARK: - チェックサム
@@ -125,7 +146,7 @@ final class ContentCatalogTests: XCTestCase {
         XCTAssertTrue(issues.contains(.missingDistractorReason(question.id)))
     }
 
-    func testValidatorRejectsUnavailableLevelAndUndeliverableType() {
+    func testValidatorRejectsUnprovidedLevelAndUndeliverableType() {
         let question = makeQuestion(
             level: .b,
             questionType: .speaking,

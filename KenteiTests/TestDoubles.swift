@@ -115,6 +115,136 @@ final class FakeQuestionAudioPlayer: QuestionAudioPlaying {
     }
 }
 
+/// 回答送信の代役。受理するキーと失敗を差し替えられる。
+final class FakeAnswerSyncer: AnswerSyncing, @unchecked Sendable {
+    private let lock = NSLock()
+    private var batches: [[PendingAnswer]] = []
+    private var failure: AnswerSyncError?
+    private var acceptedKeyLimit: Int?
+
+    init(failure: AnswerSyncError? = nil, acceptedKeyLimit: Int? = nil) {
+        self.failure = failure
+        self.acceptedKeyLimit = acceptedKeyLimit
+    }
+
+    var receivedBatches: [[PendingAnswer]] {
+        lock.withLock { batches }
+    }
+
+    var receivedKeys: [SyncIdempotencyKey] {
+        lock.withLock { batches.flatMap { $0.map(\.key) } }
+    }
+
+    func setFailure(_ failure: AnswerSyncError?) {
+        lock.withLock { self.failure = failure }
+    }
+
+    func send(_ answers: [PendingAnswer]) async throws -> [SyncIdempotencyKey] {
+        let (currentFailure, limit) = lock.withLock { () -> (AnswerSyncError?, Int?) in
+            batches.append(answers)
+            return (failure, acceptedKeyLimit)
+        }
+
+        if let currentFailure {
+            throw currentFailure
+        }
+        guard let limit else {
+            return answers.map(\.key)
+        }
+        return answers.prefix(limit).map(\.key)
+    }
+}
+
+/// メモリ上の未同期キュー保存。
+actor InMemoryPendingAnswerStore: PendingAnswerStoring {
+    private var queue: PendingAnswerQueue?
+
+    init(queue: PendingAnswerQueue? = nil) {
+        self.queue = queue
+    }
+
+    func load() async throws -> PendingAnswerQueue? { queue }
+    func save(_ queue: PendingAnswerQueue) async throws { self.queue = queue }
+    func clear() async throws { queue = nil }
+}
+
+/// AI評価の代役。決められた点数を返し、失敗も差し替えられる。
+struct FakeResponseEvaluator: ResponseEvaluating {
+    let scores: [String: Int]
+    let modelVersion: String
+    let failure: AssessmentError?
+
+    init(scores: [String: Int] = [:], modelVersion: String = "fake-model-v1", failure: AssessmentError? = nil) {
+        self.scores = scores
+        self.modelVersion = modelVersion
+        self.failure = failure
+    }
+
+    func evaluate(_ submission: AssessmentSubmission, rubric: Rubric) async throws -> AssessmentResult {
+        if let failure {
+            throw failure
+        }
+
+        let normalized = rubric.normalizedScore(from: scores)
+        return AssessmentResult(
+            submissionID: submission.id,
+            scores: rubric.criteria.map { criterion in
+                CriterionScore(criterionID: criterion.id, score: scores[criterion.id] ?? 0, commentKey: nil)
+            },
+            overallComment: "テスト用の講評",
+            normalizedScore: normalized,
+            isPassed: rubric.isPassing(normalized),
+            modelVersion: modelVersion,
+            rubricVersion: rubric.version,
+            evaluatedAt: submission.submittedAt,
+            humanReview: .notRequested
+        )
+    }
+}
+
+/// 提出ごとに点数を変えられる評価器。基準回答の回帰試験で使う。
+struct ScriptedResponseEvaluator: ResponseEvaluating {
+    let scoresBySubmissionID: [String: [String: Int]]
+    let modelVersion: String
+
+    init(scoresBySubmissionID: [String: [String: Int]], modelVersion: String = "fake-model-v1") {
+        self.scoresBySubmissionID = scoresBySubmissionID
+        self.modelVersion = modelVersion
+    }
+
+    func evaluate(_ submission: AssessmentSubmission, rubric: Rubric) async throws -> AssessmentResult {
+        let scores = scoresBySubmissionID[submission.id.rawValue] ?? [:]
+        let normalized = rubric.normalizedScore(from: scores)
+
+        return AssessmentResult(
+            submissionID: submission.id,
+            scores: rubric.criteria.map { criterion in
+                CriterionScore(criterionID: criterion.id, score: scores[criterion.id] ?? 0, commentKey: nil)
+            },
+            overallComment: "テスト用の講評",
+            normalizedScore: normalized,
+            isPassed: rubric.isPassing(normalized),
+            modelVersion: modelVersion,
+            rubricVersion: rubric.version,
+            evaluatedAt: submission.submittedAt,
+            humanReview: .notRequested
+        )
+    }
+}
+
+/// メモリ上の採点キュー保存。
+actor InMemoryAssessmentQueueStore: AssessmentQueueStoring {
+    private var state: AssessmentQueueState?
+
+    init(state: AssessmentQueueState? = nil) {
+        self.state = state
+    }
+
+    func load() async throws -> AssessmentQueueState? { state }
+    func save(_ state: AssessmentQueueState) async throws { self.state = state }
+    func clear() async throws { state = nil }
+}
+
 // MARK: - セッション生成のヘルパー
 
 enum TestSession {
@@ -145,5 +275,28 @@ enum TestSession {
                 return LearningSessionPlan.Entry(questionID: questionID, choiceIDs: question.choices.map(\.id))
             }
         )
+    }
+}
+
+/// 端末の Keychain を使わない差し替え。テストが実機の保管領域を汚さないようにする。
+final class InMemoryAssessmentCredentialStore: AssessmentCredentialStoring, @unchecked Sendable {
+    private var token: String?
+
+    init(token: String? = nil) {
+        self.token = token
+    }
+
+    func loadToken() -> String? {
+        token
+    }
+
+    func save(token: String) {
+        let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 本番の実装と同じく、空白だけの入力は未設定として扱う。
+        self.token = trimmed.isEmpty ? nil : trimmed
+    }
+
+    func clear() {
+        token = nil
     }
 }

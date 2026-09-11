@@ -23,10 +23,16 @@ final class LearningSessionModel: Identifiable {
     private(set) var audioState: AudioPlaybackState = .idle
     /// 発話の拍。増えるたびにキャラクターが一度口を動かす。
     private(set) var speechPulse = 0
+    /// 性能の実測。問題表示と音声開始が目標内かを見る。
+    let performance: PerformanceRecorder
 
     private let store: any LearningSessionStoring
     private let masteryStore: any MasteryStoring
     private let masteryEvaluator: MasteryEvaluator
+    private let syncQueue: AnswerSyncQueue?
+    private let origin: LearningSessionOrigin
+    private let practicalCheckEvaluator: PracticalCheckEvaluator
+    private var practicalChecks: [ScenarioID: PracticalCheckResult]
     private var masteryRecords: [QuestionID: QuestionMastery]
     private let audioPlayer: any QuestionAudioPlaying
     private let clock: any SessionClock
@@ -35,6 +41,8 @@ final class LearningSessionModel: Identifiable {
     private var persistenceChain: Task<Void, Never>?
 
     private var playbackTask: Task<Void, Never>?
+    private var questionShownRequestedAt: Date?
+    private var playbackRequestedAt: Date?
 
     init(
         state: LearningSessionState,
@@ -42,6 +50,11 @@ final class LearningSessionModel: Identifiable {
         masteryStore: any MasteryStoring = DisabledMasteryStore(),
         masteryRecords: [QuestionID: QuestionMastery] = [:],
         masteryEvaluator: MasteryEvaluator = MasteryEvaluator(),
+        syncQueue: AnswerSyncQueue? = nil,
+        origin: LearningSessionOrigin = .recommended,
+        practicalChecks: [ScenarioID: PracticalCheckResult] = [:],
+        practicalCheckEvaluator: PracticalCheckEvaluator = PracticalCheckEvaluator(),
+        performance: PerformanceRecorder = PerformanceRecorder(),
         audioPlayer: any QuestionAudioPlaying,
         clock: any SessionClock,
         sessionID: UUID,
@@ -52,13 +65,25 @@ final class LearningSessionModel: Identifiable {
         self.masteryStore = masteryStore
         self.masteryRecords = masteryRecords
         self.masteryEvaluator = masteryEvaluator
+        self.syncQueue = syncQueue
+        self.origin = origin
+        self.practicalChecks = practicalChecks
+        self.practicalCheckEvaluator = practicalCheckEvaluator
+        self.performance = performance
         self.audioPlayer = audioPlayer
         self.clock = clock
         self.sessionID = sessionID
         self.startedAt = startedAt
+        questionShownRequestedAt = clock.now()
 
         audioPlayer.onSpeechMark = { [weak self] in
-            self?.speechPulse += 1
+            guard let self else { return }
+            // 最初の発話が始まった時点を「音声開始」とする。
+            if let requestedAt = playbackRequestedAt {
+                performance.record(.audioStart, duration: clock.now().timeIntervalSince(requestedAt))
+                playbackRequestedAt = nil
+            }
+            speechPulse += 1
         }
     }
 
@@ -70,6 +95,8 @@ final class LearningSessionModel: Identifiable {
         masteryStore: any MasteryStoring = DisabledMasteryStore(),
         masteryRecords: [QuestionID: QuestionMastery] = [:],
         masteryEvaluator: MasteryEvaluator = MasteryEvaluator(),
+        syncQueue: AnswerSyncQueue? = nil,
+        practicalChecks: [ScenarioID: PracticalCheckResult] = [:],
         audioPlayer: any QuestionAudioPlaying,
         clock: any SessionClock,
         identifierGenerator: any IdentifierGenerating,
@@ -81,6 +108,7 @@ final class LearningSessionModel: Identifiable {
             origin: origin,
             mastery: masteryRecords,
             at: clock.now(),
+            questionCount: origin.sessionQuestionCount,
             using: &generator
         )
         // 計画は教材パックそのものから作るため食い違わない。万一に備え原稿順へ落とす。
@@ -93,6 +121,9 @@ final class LearningSessionModel: Identifiable {
             masteryStore: masteryStore,
             masteryRecords: masteryRecords,
             masteryEvaluator: masteryEvaluator,
+            syncQueue: syncQueue,
+            origin: origin,
+            practicalChecks: practicalChecks,
             audioPlayer: audioPlayer,
             clock: clock,
             sessionID: identifierGenerator.newIdentifier(),
@@ -115,6 +146,7 @@ final class LearningSessionModel: Identifiable {
         audioPlayer.stop()
         audioState = .playing
         speechPulse = 0
+        playbackRequestedAt = clock.now()
 
         playbackTask = Task { [audioPlayer] in
             // 開始前に次の再生へ置き換えられた場合は、鳴らさず数えない。
@@ -149,6 +181,13 @@ final class LearningSessionModel: Identifiable {
     }
 
     /// 画面離脱・セッション終了・問題切り替えで再生を止める。
+    /// 問題が画面に出た時点を記録する。表示までの時間が目標内かを見る。
+    func recordQuestionDisplayed() {
+        guard let requestedAt = questionShownRequestedAt else { return }
+        performance.record(.questionDisplay, duration: clock.now().timeIntervalSince(requestedAt))
+        questionShownRequestedAt = nil
+    }
+
     func stopAudio() {
         playbackTask?.cancel()
         playbackTask = nil
@@ -165,6 +204,7 @@ final class LearningSessionModel: Identifiable {
                 masteryRecords[answer.questionID],
                 with: answer
             )
+            enqueueForSync(answer)
         }
         persist()
     }
@@ -174,7 +214,9 @@ final class LearningSessionModel: Identifiable {
         let previousIndex = state.currentIndex
         stopAudio()
         state.advance()
+        questionShownRequestedAt = clock.now()
         prepareNextQuestionAudio()
+        evaluatePracticalCheckIfFinished()
         guard state.phase != previousPhase || state.currentIndex != previousIndex else { return }
         persist()
     }
@@ -224,6 +266,42 @@ final class LearningSessionModel: Identifiable {
         }
     }
 
+    /// 実戦チェックのセッションが終わったら採点し、結果を保存する。
+    private func evaluatePracticalCheckIfFinished() {
+        guard state.phase == .finalResult,
+              let scenarioID = origin.practicalCheckScenarioID else {
+            return
+        }
+
+        practicalChecks[scenarioID] = practicalCheckEvaluator.evaluate(
+            scenarioID: scenarioID,
+            answers: state.answers,
+            at: clock.now()
+        )
+        persist()
+    }
+
+    /// このセッションの実戦チェック結果。実戦チェック以外では nil。
+    var practicalCheckResult: PracticalCheckResult? {
+        guard let scenarioID = origin.practicalCheckScenarioID else { return nil }
+        return practicalChecks[scenarioID]
+    }
+
+    /// 回答を未同期キューへ積む。オフラインでも積み、再接続後に一度だけ送る。
+    private func enqueueForSync(_ answer: AnsweredQuestion) {
+        guard let syncQueue else { return }
+
+        let pending = PendingAnswer(
+            key: SyncIdempotencyKey(sessionID: sessionID, questionID: answer.questionID, attempt: 1),
+            answer: answer,
+            contentVersion: state.contentVersion,
+            queuedAt: clock.now()
+        )
+        Task {
+            await syncQueue.enqueue(pending)
+        }
+    }
+
     private func persist() {
         let snapshot = state.snapshot(
             sessionID: sessionID,
@@ -232,7 +310,8 @@ final class LearningSessionModel: Identifiable {
         )
         let records = MasteryRecords(
             settingsVersion: masteryEvaluator.settings.version,
-            records: Array(masteryRecords.values).sorted { $0.questionID.rawValue < $1.questionID.rawValue }
+            records: Array(masteryRecords.values).sorted { $0.questionID.rawValue < $1.questionID.rawValue },
+            practicalChecks: Array(practicalChecks.values).sorted { $0.scenarioID.rawValue < $1.scenarioID.rawValue }
         )
         let previous = persistenceChain
         persistenceChain = Task { [store, masteryStore] in

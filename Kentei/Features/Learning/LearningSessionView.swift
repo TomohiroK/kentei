@@ -327,6 +327,7 @@ private struct AudioPlaybackBar: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .kenteiCard()
         .task(id: questionID) {
+            model.recordQuestionDisplayed()
             guard isAutoplayEnabled, model.state.phase == .answering else { return }
             model.playCurrentQuestion(rate: rate)
         }

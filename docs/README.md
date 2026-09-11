@@ -12,18 +12,21 @@
 | [screen-design-prototype.md](screen-design-prototype.md) | 実装済み画面、遷移、スクリーンショット、現在の実装境界 |
 | [content-and-data-specification.md](content-and-data-specification.md) | 問題、音声、タグ、進捗、API、AI評価、分析イベント |
 | [delivery-plan.md](delivery-plan.md) | 段階開発、Definition of Done、リスク、未確定事項 |
+| [recording-policy.md](recording-policy.md) | 承認済みのスピーチ・面接録音方針、削除・送信範囲、受入条件 |
 | [device-install.md](device-install.md) | 実機ビルド・署名・7日ごとの再インストール手順 |
 | [assets/character-reference.png](assets/character-reference.png) | キャラクターのデザイン参照資料 |
 | [assets/generated-character-assets.md](assets/generated-character-assets.md) | プロトタイプ用派生素材、生成指示、品質確認、本番ゲート |
 
 ## ステータス
 
+最新の機能別進捗は [delivery-plan.md](delivery-plan.md) を参照。2026-09-07にB/A級スピーチ・面接のローカル練習を追加した。実機録音と実採点は未確認であり、以下の2026-08-22時点の件数・状態とは分けて扱う。
+
 - 文書整理日: 2026-08-22
 - プロダクト仕様: MVP実装開始に必要な範囲を確定
 - iOS実装: 初回導入、主要5タブ、20問学習フロー（出題順・選択肢順はセッションごとにランダム）、
   回答のローカル保存と途中復帰、音声再生と2話者の会話問題（合成音声による暫定実装）、
-  習得状態の記録と生活図鑑（行動解放・達成率・場面別学習）、E級40問 + D級20問の教材と自動検査
-- テスト: 単体90件 + UI 8件（`KenteiUITests` で20問通し・復帰・初回導入・生活図鑑を実操作で確認）
+  習得状態の記録と生活図鑑（行動解放・達成率・場面別学習）、E級40問 + D級20問 + C級45問の教材と自動検査、C級9カテゴリの実戦チェック、AI評価の骨組み（採点は未接続）
+- テスト: 単体135件 + UI 12件（`KenteiUITests` で20問通し・復帰・初回導入・生活図鑑・多言語・データ削除を実操作で確認）
 - 対象プラットフォーム: iOS 17以上
 - 現在確認済みのローカルツールチェーン: Xcode 26.3 / Swift 6.2.4
 - Bundle ID / Signing Team: 決定済み（[device-install.md](device-install.md) 参照）

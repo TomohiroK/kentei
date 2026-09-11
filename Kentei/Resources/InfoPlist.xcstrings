@@ -1,0 +1,18 @@
+{
+  "sourceLanguage": "ja",
+  "strings": {
+    "NSMicrophoneUsageDescription": {
+      "localizations": {
+        "ja": { "stringUnit": { "state": "translated", "value": "スピーチ・面接の練習を録音し、端末内で文字起こしします。" } },
+        "id": { "stringUnit": { "state": "translated", "value": "Merekam latihan pidato dan wawancara untuk ditranskripsikan hanya di perangkat." } }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription": {
+      "localizations": {
+        "ja": { "stringUnit": { "state": "translated", "value": "発話の内容を文字にして、学習に使います。音声は端末の中だけで処理します。" } },
+        "id": { "stringUnit": { "state": "translated", "value": "Mengubah ucapan menjadi teks untuk latihan. Audio diproses hanya di perangkat." } }
+      }
+    }
+  },
+  "version": "1.0"
+}

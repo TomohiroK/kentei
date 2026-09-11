@@ -1,0 +1,9 @@
+.vercel
+node_modules
+
+# 値の入ったものは追跡しない。テンプレートだけ残す。
+.env*
+!.env.example
+
+# ビルド生成物（デプロイ時に生成する）
+api/

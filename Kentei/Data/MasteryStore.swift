@@ -4,22 +4,44 @@ import Foundation
 ///
 /// 保存形式・キー・列挙値は互換性契約である。変更時は `currentSchemaVersion` を上げ、
 /// 旧バージョンの読込テストを同じ変更で追加する。
+/// - v1: 問題ごとの習得記録のみ。
+/// - v2: 実戦チェックの結果を加える。v1のデータは実戦チェック未実施として読み込む。
 struct MasteryRecords: Codable, Equatable, Sendable {
-    static let currentSchemaVersion = 1
+    static let currentSchemaVersion = 2
+    static let supportedSchemaVersions: Set<Int> = [1, 2]
 
     let schemaVersion: Int
     /// 判定に使った設定の版。係数変更前後の説明可能性を保つ。
     let settingsVersion: String
     let records: [QuestionMastery]
+    let practicalChecks: [PracticalCheckResult]
 
     init(
         schemaVersion: Int = MasteryRecords.currentSchemaVersion,
         settingsVersion: String = MasteryScoringSettings.current.version,
-        records: [QuestionMastery]
+        records: [QuestionMastery],
+        practicalChecks: [PracticalCheckResult] = []
     ) {
         self.schemaVersion = schemaVersion
         self.settingsVersion = settingsVersion
         self.records = records
+        self.practicalChecks = practicalChecks
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        settingsVersion = try container.decode(String.self, forKey: .settingsVersion)
+        records = try container.decode([QuestionMastery].self, forKey: .records)
+        // v1 には実戦チェックが無い。未実施として読み込む。
+        practicalChecks = try container.decodeIfPresent([PracticalCheckResult].self, forKey: .practicalChecks) ?? []
+    }
+
+    /// カテゴリごとの最新の実戦チェック結果。
+    var latestPracticalChecks: [ScenarioID: PracticalCheckResult] {
+        Dictionary(practicalChecks.map { ($0.scenarioID, $0) }) { first, second in
+            second.evaluatedAt >= first.evaluatedAt ? second : first
+        }
     }
 
     var byQuestionID: [QuestionID: QuestionMastery] {
@@ -77,7 +99,7 @@ actor FileMasteryStore: MasteryStoring {
             throw LearningSessionStoreError.corruptedData
         }
 
-        guard records.schemaVersion == MasteryRecords.currentSchemaVersion else {
+        guard MasteryRecords.supportedSchemaVersions.contains(records.schemaVersion) else {
             // 対応外の版は捨てる。誤った習得判定で行動を解放しない。
             return nil
         }

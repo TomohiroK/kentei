@@ -18,6 +18,11 @@ final class AppModel {
     private(set) var resumeState: ResumeState = .unavailable
     /// 習得記録。生活図鑑の達成率と復習の優先度はこれを根拠にする。
     private(set) var mastery: [QuestionID: QuestionMastery] = [:]
+    /// カテゴリごとの直近の実戦チェック結果。
+    private(set) var practicalChecks: [ScenarioID: PracticalCheckResult] = [:]
+    /// 未送信の回答数。送信先が未確定の間も、回答は端末に積まれる。
+    private(set) var pendingSyncCount = 0
+    let networkMonitor = NetworkMonitor()
     /// 初回導入で受け取った学習者の前提。未設定なら初回導入から始める。
     private(set) var learnerProfile: LearnerProfile?
 
@@ -41,6 +46,8 @@ final class AppModel {
 
     private let store: any LearningSessionStoring
     private let masteryStore: any MasteryStoring
+    private let syncQueue: AnswerSyncQueue
+    private let answerSyncer: any AnswerSyncing
     private let masteryEvaluator: MasteryEvaluator
     private let atlasEvaluator: LifeAtlasEvaluator
     private let audioPlayer: any QuestionAudioPlaying
@@ -48,6 +55,8 @@ final class AppModel {
     private let identifierGenerator: any IdentifierGenerating
     private let randomProvider: any RandomGeneratorProviding
     private let profileStore: any LearnerProfileStoring
+    private let credentialStore: any AssessmentCredentialStoring
+    private let assessmentQueue: AssessmentQueue
     private var restoredState: LearningSessionState?
     private var restoredSessionID: UUID?
     private var restoredStartedAt: Date?
@@ -56,13 +65,17 @@ final class AppModel {
         contentPack: LearningContentPack = DemoLearningContent.pack,
         store: any LearningSessionStoring,
         masteryStore: any MasteryStoring = DisabledMasteryStore(),
+        pendingAnswerStore: any PendingAnswerStoring = DisabledPendingAnswerStore(),
+        answerSyncer: any AnswerSyncing = UnconfiguredAnswerSyncer(),
         masteryEvaluator: MasteryEvaluator = MasteryEvaluator(),
         atlasEvaluator: LifeAtlasEvaluator = LifeAtlasEvaluator(),
         audioPlayer: any QuestionAudioPlaying = SpeechQuestionAudioPlayer(),
         clock: any SessionClock = SystemSessionClock(),
         identifierGenerator: any IdentifierGenerating = SystemIdentifierGenerator(),
         randomProvider: any RandomGeneratorProviding = SystemRandomGeneratorProvider(),
-        profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore()
+        profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore(),
+        credentialStore: any AssessmentCredentialStoring = LayeredAssessmentCredentialStore(),
+        assessmentQueueStore: any AssessmentQueueStoring = DisabledAssessmentQueueStore()
     ) {
         // 検証を通った版だけを有効にする。落ちた場合も学習を止めず、不備を画面に出す。
         let activation = ContentPackActivator().activate(candidate: contentPack, current: nil)
@@ -76,6 +89,8 @@ final class AppModel {
         }
         self.store = store
         self.masteryStore = masteryStore
+        syncQueue = AnswerSyncQueue(store: pendingAnswerStore)
+        self.answerSyncer = answerSyncer
         self.masteryEvaluator = masteryEvaluator
         self.atlasEvaluator = atlasEvaluator
         self.audioPlayer = audioPlayer
@@ -83,7 +98,43 @@ final class AppModel {
         self.identifierGenerator = identifierGenerator
         self.randomProvider = randomProvider
         self.profileStore = profileStore
+        self.credentialStore = credentialStore
+        isAssessmentAvailable = credentialStore.loadToken() != nil
+        assessmentQueue = AssessmentQueue(store: assessmentQueueStore)
         learnerProfile = profileStore.load()
+    }
+
+    /// 記述課題の採点が使えるか。
+    ///
+    /// 保管を直接読む計算プロパティにすると `@Observable` が変化を追えず、
+    /// 変更しても再起動するまで画面が変わらない。状態として保持する。
+    private(set) var isAssessmentAvailable: Bool
+
+    /// トークンの取得元。設定画面で状態を示すために使う。
+    var assessmentTokenSource: AssessmentTokenSource {
+        (credentialStore as? LayeredAssessmentCredentialStore)?.source
+            ?? (credentialStore.loadToken() == nil ? .none : .device)
+    }
+
+    func saveAssessmentToken(_ token: String) {
+        credentialStore.save(token: token)
+        isAssessmentAvailable = credentialStore.loadToken() != nil
+    }
+
+    /// 記述課題の進行を作る。採点は中継サーバー経由で行う。
+    func makeWritingTaskModel(
+        task: WritingTask,
+        initialState: WritingTaskModel.State = .editing
+    ) -> WritingTaskModel {
+        WritingTaskModel(
+            task: task,
+            rubric: DemoAssessment.rubric(with: task.rubricID) ?? DemoAssessment.writingRubric,
+            evaluator: RelayResponseEvaluator(credentialStore: credentialStore),
+            queue: assessmentQueue,
+            clock: clock,
+            identifierGenerator: identifierGenerator,
+            initialState: initialState
+        )
     }
 
     /// 初回導入の完了を保存する。以降の起動では導入を出さない。
@@ -95,18 +146,28 @@ final class AppModel {
     /// 既定の保存先を用意できない場合でも学習は継続できるようにする。
     static func live(profileStore: any LearnerProfileStoring = UserDefaultsLearnerProfileStore()) -> AppModel {
         let stores = makeStores()
-        return AppModel(store: stores.session, masteryStore: stores.mastery, profileStore: profileStore)
+        return AppModel(
+            store: stores.session,
+            masteryStore: stores.mastery,
+            pendingAnswerStore: stores.pending,
+            profileStore: profileStore
+        )
     }
 
     /// 保存先を用意できない場合は、保存しない実装へまとめて落とす。片方だけ保存する状態を作らない。
-    private static func makeStores() -> (session: any LearningSessionStoring, mastery: any MasteryStoring) {
+    private static func makeStores() -> (
+        session: any LearningSessionStoring,
+        mastery: any MasteryStoring,
+        pending: any PendingAnswerStoring
+    ) {
         do {
             return (
                 FileLearningSessionStore(fileURL: try FileLearningSessionStore.defaultFileURL()),
-                FileMasteryStore(fileURL: try FileMasteryStore.defaultFileURL())
+                FileMasteryStore(fileURL: try FileMasteryStore.defaultFileURL()),
+                FilePendingAnswerStore(fileURL: try FilePendingAnswerStore.defaultFileURL())
             )
         } catch {
-            return (DisabledLearningSessionStore(), DisabledMasteryStore())
+            return (DisabledLearningSessionStore(), DisabledMasteryStore(), DisabledPendingAnswerStore())
         }
     }
 
@@ -114,7 +175,10 @@ final class AppModel {
     func resetStoredLearningData() async {
         try? await store.clear()
         try? await masteryStore.clear()
+        await syncQueue.clear()
+        pendingSyncCount = 0
         mastery = [:]
+        practicalChecks = [:]
         profileStore.clear()
         learnerProfile = profileStore.load()
         clearRestored()
@@ -125,7 +189,22 @@ final class AppModel {
     /// 破損・教材版違い・問題構成違いは復帰させず、保存を破棄して新規開始できる状態に戻す。
     /// 習得記録を読み直す。読めない場合は空として扱い、学習を止めない。
     func refreshMastery() async {
-        mastery = ((try? await masteryStore.load()) ?? nil)?.byQuestionID ?? [:]
+        let records = (try? await masteryStore.load()) ?? nil
+        mastery = records?.byQuestionID ?? [:]
+        practicalChecks = records?.latestPracticalChecks ?? [:]
+    }
+
+    /// 未送信の回答を送る。受理されたものだけキューから外し、二重送信を防ぐ。
+    @discardableResult
+    func flushPendingAnswers() async -> AnswerSyncResult {
+        let result = await syncQueue.flush(using: answerSyncer)
+        pendingSyncCount = await syncQueue.pendingCount
+        return result
+    }
+
+    func refreshPendingSyncCount() async {
+        await syncQueue.load()
+        pendingSyncCount = await syncQueue.pendingCount
     }
 
     /// 生活図鑑の各カテゴリの進捗。解放判定の根拠つきで返す。
@@ -136,6 +215,7 @@ final class AppModel {
                 for: scenario,
                 pack: contentPack,
                 mastery: mastery,
+                practicalCheck: practicalChecks[scenario.id],
                 at: evaluatedAt
             )
         }
@@ -200,6 +280,8 @@ final class AppModel {
             masteryStore: masteryStore,
             masteryRecords: mastery,
             masteryEvaluator: masteryEvaluator,
+            syncQueue: syncQueue,
+            practicalChecks: practicalChecks,
             audioPlayer: audioPlayer,
             clock: clock,
             identifierGenerator: identifierGenerator,
@@ -215,6 +297,7 @@ final class AppModel {
             masteryStore: masteryStore,
             masteryRecords: mastery,
             masteryEvaluator: masteryEvaluator,
+            syncQueue: syncQueue,
             audioPlayer: audioPlayer,
             clock: clock,
             sessionID: identifierGenerator.newIdentifier(),
@@ -231,6 +314,7 @@ final class AppModel {
             masteryStore: masteryStore,
             masteryRecords: mastery,
             masteryEvaluator: masteryEvaluator,
+            syncQueue: syncQueue,
             audioPlayer: audioPlayer,
             clock: clock,
             sessionID: restoredSessionID,

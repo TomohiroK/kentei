@@ -1,0 +1,26 @@
+[
+  {
+    "level": "b", "turn": 0,
+    "text": "Saya akan segera memberi tahu atasan bahwa laporan mungkin terlambat, bukan menunggu sampai batas waktunya lewat. Saya akan menjelaskan bahwa data dari bagian penjualan belum lengkap dan menyebutkan bagian yang sudah selesai. Sebagai solusi, saya akan mengirimkan ringkasan sementara hari ini dan meminta waktu sampai besok siang untuk menyelesaikan sisanya. Saya juga akan menghubungi bagian penjualan agar data yang diperlukan segera dikirim."
+  },
+  {
+    "level": "b", "turn": 1,
+    "text": "Pak, mohon maaf, data penjualan untuk laporan kita belum lengkap. Analisis bagian lain sudah selesai. Agar Bapak tetap bisa mempersiapkan rapat, saya mengusulkan mengirimkan ringkasan sementara sore ini. Jika Bapak berkenan, laporan lengkap akan saya serahkan besok siang setelah data tersebut diperiksa. Saya sudah menghubungi bagian penjualan dan akan memberi kabar lagi pukul tiga. Apakah rencana ini dapat diterima?"
+  },
+  {
+    "level": "b", "turn": 2,
+    "text": "Jika tenggat waktu tidak dapat diubah, saya akan menanyakan bagian mana yang paling dibutuhkan untuk rapat. Saya akan menyelesaikan bagian itu terlebih dahulu dan meminta rekan membantu memeriksa data yang tersedia. Data yang belum lengkap akan saya tandai dengan jelas, bukan saya isi dengan perkiraan tanpa penjelasan. Dengan cara ini, atasan tetap menerima informasi penting tepat waktu dan mengetahui keterbatasan laporan tersebut."
+  },
+  {
+    "level": "a", "turn": 0,
+    "text": "Menurut saya, bekerja dari rumah tidak selalu melemahkan kerja sama, tetapi risikonya meningkat apabila aturan komunikasi tidak jelas. Keuntungannya adalah waktu perjalanan berkurang dan pekerjaan yang membutuhkan konsentrasi dapat dilakukan dengan lebih tenang. Di sisi lain, pertukaran informasi informal dan pendampingan pegawai baru dapat berkurang. Saya mengusulkan jadwal kerja hibrida, dokumentasi keputusan bersama, serta pertemuan singkat mingguan. Misalnya, tim proyek dapat menggunakan hari di kantor untuk menyelesaikan masalah lintas bagian, sementara penulisan laporan dilakukan dari rumah."
+  },
+  {
+    "level": "a", "turn": 1,
+    "text": "Saya akan membandingkan kondisi sebelum dan sesudah penerapan sistem hibrida selama tiga bulan. Indikatornya meliputi jumlah tugas yang terlambat karena miskomunikasi, waktu penyelesaian masalah lintas bagian, dan penilaian anggota tim terhadap kejelasan pembagian tugas. Kehadiran rapat saja tidak cukup karena banyak rapat belum tentu menunjukkan kerja sama yang baik. Hasilnya perlu dibandingkan dengan beban kerja agar peningkatan yang terlihat tidak semata-mata disebabkan oleh berkurangnya proyek. Wawancara singkat dengan pegawai baru juga dapat membantu mengungkap kesulitan yang tidak terlihat dalam angka."
+  },
+  {
+    "level": "a", "turn": 2,
+    "text": "Keberatan mengenai biaya perlu diperiksa dengan membandingkan biaya tambahan dan kerugian akibat miskomunikasi. Pertemuan mingguan dan pencatatan keputusan dapat menggunakan perangkat yang sudah tersedia, sehingga tidak selalu memerlukan langganan baru. Saya akan memulai uji coba pada satu tim dengan anggaran terbatas, lalu menghitung apakah pengurangan pekerjaan ulang dan keterlambatan sebanding dengan waktu yang digunakan untuk koordinasi. Jika manfaatnya kecil, frekuensi pertemuan dapat dikurangi. Dengan demikian, keputusan untuk memperluas program didasarkan pada bukti, bukan asumsi bahwa semua kegiatan koordinasi pasti bermanfaat."
+  }
+]
